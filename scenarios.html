@@ -1,0 +1,15 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex">
+<title>TGG prototype · test scenarios</title><style>
+:root{--navy:#001042;--blue:#0050EF;--green:#B2FF00;--ink:#001042;--ink2:#5D677D;--bg:#F4F7FC}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.45 -apple-system,system-ui,"Helvetica Neue",Arial,sans-serif}
+main{max-width:620px;margin:0 auto;padding:40px 16px 56px}
+.eb{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--blue)}
+h1{font-size:30px;line-height:1.1;margin:6px 0 10px}p{color:var(--ink2);margin:0 0 20px}
+ul{list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:10px}
+a{display:flex;align-items:center;gap:12px;text-decoration:none;color:inherit;background:#fff;border:1px solid #E3E8F2;border-radius:18px;padding:16px 18px}
+a:hover{border-color:var(--blue)}a span{flex:1;display:flex;flex-direction:column;gap:2px}small{color:var(--ink2);font-size:14px}
+code{font-size:12px;color:var(--blue);margin-top:4px}i{font-style:normal;font-size:20px;color:var(--blue)}
+.tip{margin-top:24px;background:var(--navy);color:#fff;border-radius:18px;padding:18px}.tip p{color:#CDDFFF;margin:6px 0 0;font-size:14px}
+</style></head><body><main><div class="eb">The Gym Group · user testing</div><h1>Test scenarios</h1>
+<p>Each link opens the prototype fresh in the right state. Open it on the participant’s phone, or send them the link for that task.</p><ul><li><a href="./?start=join"><span><b>Sign up from scratch</b><small>Welcome screen. Task: find a gym, pick a membership and join.</small><code>?start=join</code></span><i>→</i></a></li><li><a href="./?start=new"><span><b>Brand-new member</b><small>Just joined, new to the gym, no visits yet. Task: get ready for a first visit and book a Kickstart.</small><code>?start=new</code></span><i>→</i></a></li><li><a href="./?start=returning"><span><b>Returning member</b><small>Sign in screen, details filled in. Task: sign in, check this week and book a class.</small><code>?start=returning</code></span><i>→</i></a></li><li><a href="./?start=guest"><span><b>Just exploring</b><small>Browsing as a guest with no gym chosen. Task: look around, build a plan, find a gym.</small><code>?start=guest</code></span><i>→</i></a></li><li><a href="./?start=former"><span><b>Former member</b><small>Sign in with an old account. Task: sign in and decide whether to rejoin.</small><code>?start=former</code></span><i>→</i></a></li></ul>
+<div class="tip"><b>Running sessions</b><p>Opening a scenario link always starts clean. To switch scenario or reset on the same phone (including when it’s added to the home screen), tap “App version 4.2.0” at the bottom of the You tab, then pick a scenario or “Reset the app”.</p></div></main></body></html>
