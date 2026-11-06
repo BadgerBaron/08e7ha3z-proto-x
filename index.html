@@ -187,6 +187,13 @@ h1,h2,h3,p{margin:0}
 .bars i.now{background:var(--energy-blue)}
 .bars i.peak{background:var(--busy)}
 .busy-off .bars i{background:var(--border);opacity:.7}.busy-off .badge{display:inline-flex;gap:4px;align-items:center;background:var(--muted);color:var(--ink-2,#5c6270)}.busy-off .badge svg{width:12px;height:12px}
+.joincard{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-card);padding:20px;display:flex;flex-direction:column;gap:10px}
+.joincard .eyebrow{color:var(--energy-blue)}.joincard .h2{font-size:22px}
+.jc-list{list-style:none;margin:2px 0 6px;padding:0;display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.jc-list li{display:flex;flex-direction:column;align-items:flex-start;gap:8px;padding:12px;border-radius:var(--r-tile);background:var(--muted);font-size:13px;font-weight:700;line-height:1.25}
+.jc-list li span{width:32px;height:32px;border-radius:50%;background:var(--electric-green);color:var(--on-green);display:grid;place-items:center;font-size:16px}
+.guestcard.gc-blue{background:var(--energy-blue)}.guestcard.gc-blue p{color:#E6EFFF}
+.busy-demo .badge{background:var(--muted);color:var(--ink-2)}
 .barlabels{display:flex;justify-content:space-between;font-size:12px;color:var(--ink-2)}
 
 /* buddy */
@@ -1192,7 +1199,7 @@ let workouts=[...base,...(state.custom||[])];
 function toast(t){const el=$('#toast');el.innerHTML=ico('check')+`<span>${esc(t)}</span>`;el.classList.add('show');clearTimeout(toast.t);toast.t=setTimeout(()=>el.classList.remove('show'),2600)}
 
 function appbar(){return `<header class="appbar">
-  <button class="gympick" onclick="${noLoc()?"goOb('find')":"switchGym()"}" aria-label="${noLoc()?'No gym chosen yet. Choose a gym':(member?'Your gym':noGym?'Nearest gym':'Viewing')+': '+esc(homeGym)+'. '+(member?'Switch gym':'Choose a gym')}">
+  <button class="gympick" onclick="switchGym()" aria-label="${noLoc()?'No gym chosen yet. Choose a gym':(member?'Your gym':noGym?'Nearest gym':'Viewing')+': '+esc(homeGym)+'. '+(member?'Switch gym':'Choose a gym')}">
     <span><small>${noLoc()?'No gym yet':member?'Your gym':noGym?'Nearest to you':'Viewing'}</small><strong>${noLoc()?'Choose a gym':esc(homeGym)} ${ico('chevron-down')}</strong></span>
   </button>
   <div class="actions">
@@ -1222,17 +1229,17 @@ function weekcard(){const left=Math.max(0,state.target-state.visits),hit=state.v
 </section>`}
 
 const BUSY=[18,34,55,48,30,26,22,28,45,65,88,92,70,40,22];/* 06–20 */
-function busycard(){const nowIdx=7;if(noLoc())return `<section class="card busy-off" aria-labelledby="bz">
-  <div class="busyhead"><h2 class="h2" id="bz" style="font-size:20px">How busy is it?</h2><span class="badge">${ico('lock')}Pick a gym</span></div>
-  <div class="bars" aria-hidden="true">${BUSY.map(n=>`<i style="height:${n}%"></i>`).join('')}</div>
-  <p class="meta" style="margin-top:6px">Choose a gym or share your location to see live busy times and the quietest time to go.</p>
-  <button class="link" onclick="goOb('find')">Choose a gym ${ico('arrow-right')}</button>
-</section>`;return `<section class="card" aria-labelledby="bz">
-  <div class="busyhead"><h2 class="h2" id="bz" style="font-size:20px">Nice and quiet</h2><span class="badge live">Live</span></div>
-  <p class="meta num" style="margin-top:4px">32 people in right now</p>
+function busycard(){const nowIdx=7,qt=(GYMS.find(g=>g.n===homeGym)||GYMS[0]).q;if(!member&&noGym)return `<section class="card busy-demo" aria-labelledby="bz">
+  <div class="busyhead"><h2 class="h2" id="bz" style="font-size:20px">Know before you go.</h2><span class="badge">Example</span></div>
+  <p class="meta" style="margin-top:4px">Every gym shows how busy it is, live, and when it’s usually quietest.</p>
   <div class="bars" aria-hidden="true">${BUSY.map((n,i)=>`<i class="${i===nowIdx?'now':n>80?'peak':''}" style="height:${n}%"></i>`).join('')}</div>
   <div class="barlabels num" aria-hidden="true"><span>6am</span><span>Now</span><span>8pm</span></div>
-  <p class="meta" style="margin-top:10px">Quiet until about 4pm. Good time to grab your favourite kit.</p>
+  <button class="link" onclick="switchGym()">Pick a gym to see it live ${ico('arrow-right')}</button></section>`;return `<section class="card" aria-labelledby="bz">
+  <div class="busyhead"><h2 class="h2" id="bz" style="font-size:20px">${qt?'Nice and quiet':'Picking up'}</h2><span class="badge live">Live</span></div>
+  <p class="meta num" style="margin-top:4px">${qt?32:64} people in ${member?'right now':esc(homeGym.replace('London ',''))+' right now'}</p>
+  <div class="bars" aria-hidden="true">${BUSY.map((n,i)=>{const v=qt?n:Math.min(95,n+(i<=nowIdx+2?26:6));return `<i class="${i===nowIdx?'now':v>80?'peak':''}" style="height:${v}%"></i>`}).join('')}</div>
+  <div class="barlabels num" aria-hidden="true"><span>6am</span><span>Now</span><span>8pm</span></div>
+  <p class="meta" style="margin-top:10px">${qt?'Quiet until about 4pm. Good time to grab your favourite kit.':'Busy until about 7pm. Quieter after 8pm.'}</p>
   <button class="link" onclick="busytimes()">Find your best time ${ico('arrow-right')}</button>
 </section>`}
 
@@ -1377,15 +1384,17 @@ ${member?budCard():''}${back?weekcard()+upNext():''}
   ${(()=>{const h=heroPick(),C={0:['Less overthinking. More doing.','Your next workout, sorted. A friendly plan to help you find your feet.'],1:['Back in the swing.','Start where you are. A feel-good full-body session, no catching up required.'],2:['Stronger, your way.','A proper full-body strength session. Swap kit whenever you need to.']}[h.id];return `<div class="copy"><span class="tag">${state.goals?'Picked for your goals':'A good place to start'}</span><h2 class="display d-hero">${C[0]}</h2>
   <p>${C[1]}</p>
   <button class="btn btn-green btn-sm" style="min-height:48px" onclick="detail(${h.id})">`})()}Let’s get moving ${ico('arrow-right')}</button></div></section>`:planner()}
+ ${member?'':busycard()}
  ${member&&!state.goals?`<section class="goalprompt" aria-labelledby="gpt"><span class="gi">${ico('target')}</span><div style="display:flex;flex-direction:column"><h2 id="gpt">Make this app yours</h2><p>Tell us how often you can train and what you’re into. We’ll tune your workouts and classes to match.</p><button class="btn btn-primary" onclick="openGoals()">Set my goals ${ico('arrow-right')}</button></div></section>`:''}
  ${member&&brandNew()?firstClasses():''}
- ${back?'':member?weekcard():guestBanner()}
+ ${back?'':member?weekcard():''}
  <div class="sechead"><h2 class="h2">${state.goals?'Picked for your goals':'A little direction?'}</h2><button class="link" onclick="navigate('workouts')">All workouts ${ico('arrow-right')}</button></div>
  <div class="rail">${pickedWorkouts().slice(0,4).map(card).join('')}</div>
  ${member&&!back&&!brandNew()?classesForYou():''}
- ${busycard()}
- ${back?'':buddycard('A gym buddy. In your headphones.','Someone in your corner, from first rep to last.')}
+ ${member?busycard():''}
+ ${back||!member?'':buddycard('A gym buddy. In your headphones.','Someone in your corner, from first rep to last.')}
  ${friendhero()}
+ ${member?'':guestBanner()}
  <p class="signoff">For every group, there’s <b>The Gym Group</b>.</p>`}
 
 function workoutpage(){const list=filter==='Saved'?workouts.filter(w=>state.saved.includes(w.id)):filter==='Quick wins'?workouts.filter(w=>w.time<=20):filter==='Beginner'?workouts.filter(w=>w.level==='Beginner'||w.level==='All levels'):workouts;
@@ -1701,10 +1710,11 @@ function scanFound(){clearTimeout(entryT);const s=$('#scanner');if(!s||s.classLi
   s.setAttribute('aria-label','Code scanned. The door is open');s.querySelector('.sc-msg').textContent='Got it. Door’s open, step on through';
   const f=$('#overlay .sfoot');if(f)f.innerHTML=`<button class="btn btn-primary" onclick="checkIn()">${ico('check')} I’m in</button>`}
 
-function switchGym(){modal(member?'Switch gym.':'Choose a gym.',member?'Your gym':'Gyms near you',`<p class="body">${member?'Pick your home gym. Your class timetable, busy times and gym entry update to match.':'Pick a gym to look around. Its class timetable and busy times update to match.'}</p>
- <div role="radiogroup" aria-label="Gyms near you" style="display:flex;flex-direction:column;gap:8px">${GYMS.map((g,i)=>{const on=g.n===homeGym;return `<button class="choice" role="radio" aria-checked="${on}" onclick="setGym(${i})" style="${on?'box-shadow:inset 0 0 0 2px var(--energy-blue)':''}"><span class="ri" style="width:40px;height:40px;border-radius:50%;background:var(--tonal);color:var(--tonal-ink);display:grid;place-items:center;font-size:18px;flex-shrink:0">${ico('map-pin')}</span><span style="flex:1;min-width:0"><b>${esc(g.n)}</b><small>${g.d} · <span style="color:${g.q?'var(--success)':'#B54708'};font-weight:700">${g.b}</span></small></span><span class="radio"></span></button>`}).join('')}</div>`,
- `<button class="btn btn-tonal" onclick="closeModal();setTimeout(tour,260)">${ico('map')} Explore ${esc(homeGym)}</button>`)}
-function setGym(i){const n=GYMS[i].n;noGym=false;gymPick=i;if(n===homeGym){closeModal();render();return}homeGym=n;closeModal();render();toast('Switched to '+n.replace('London ','')+'. Classes updated')}
+function switchGym(){modal(member?'Switch gym.':'Choose a gym.',member?'Your gym':'Gyms near you',`<p class="body">${member?'Pick your home gym. Your class timetable, busy times and gym entry update to match.':'Pick a gym to look around. Its classes and busy times update to match. No sign-up needed.'}</p>
+ ${!member&&loc!=='on'?`<button class="btn btn-tonal btn-sm" style="align-self:flex-start" onclick="closeModal();setTimeout(()=>askLoc(),260)">${ico('locate-fixed')} ${loc==='off'?'Location is off':'Use my location'}</button>`:''}
+ <div role="radiogroup" aria-label="Gyms near you" style="display:flex;flex-direction:column;gap:8px">${GYMS.map((g,i)=>{const on=(member||!noGym)&&g.n===homeGym;return `<button class="choice" role="radio" aria-checked="${on}" onclick="setGym(${i})" style="${on?'box-shadow:inset 0 0 0 2px var(--energy-blue)':''}"><span class="ri" style="width:40px;height:40px;border-radius:50%;background:var(--tonal);color:var(--tonal-ink);display:grid;place-items:center;font-size:18px;flex-shrink:0">${ico('map-pin')}</span><span style="flex:1;min-width:0"><b>${esc(g.n)}</b><small>${member||loc==='on'?g.d+' · ':''}<span style="color:${g.q?'var(--success)':'#B54708'};font-weight:700">${g.b}</span></small></span><span class="radio"></span></button>`}).join('')}</div>`,
+ noLoc()?'':`<button class="btn btn-tonal" onclick="closeModal();setTimeout(tour,260)">${ico('map')} Explore ${esc(homeGym)}</button>`)}
+function setGym(i){const n=GYMS[i].n,first=noGym;noGym=false;gymPick=i;if(n===homeGym&&!first){closeModal();render();return}homeGym=n;closeModal();render();toast(member?'Switched to '+n.replace('London ','')+'. Classes updated':'Showing '+n.replace('London ','')+'. Classes and busy times updated')}
 function tour(){const z=[['scan-line','Entry and changing rooms','Scan the QR code on the pod with your app to get in. Bring a padlock for your locker.'],['footprints','Cardio area','Walk, cycle or run at whatever pace suits you.'],['dumbbell','Strength area','Machines, free weights and people happy to point you in the right direction.']];
   modal('A familiar face. A familiar place.','Meet your gym',`<div class="scar"><div class="carousel" onscroll="tourScroll(this)" aria-label="Photos of ${esc(homeGym)}">${SLIDES.map(([k,c])=>`<figure><img src="${IMG[k]}" alt="${c}"><figcaption>${c}</figcaption></figure>`).join('')}</div><button class="nav l" aria-label="Previous photo" onclick="const c=this.parentNode.querySelector('.carousel');c.scrollBy({left:-c.clientWidth,behavior:'smooth'})">${ico('chevron-left')}</button><button class="nav r" aria-label="Next photo" onclick="const c=this.parentNode.querySelector('.carousel');c.scrollBy({left:c.clientWidth,behavior:'smooth'})">${ico('chevron-right')}</button><span class="count">1 / ${SLIDES.length}</span><div class="dots" aria-hidden="true">${SLIDES.map((_,i)=>`<i class="${i?'':'on'}"></i>`).join('')}</div></div>
   <p class="body">Take a look around ${esc(homeGym)} before your first visit. Here’s what to look out for.</p>
@@ -1878,8 +1888,8 @@ function bdGo(){const v=($('#bdtext').value||'').trim();if(!v){$('#bdtext').focu
 let loc='ask';
 function noLoc(){return !member&&noGym&&loc!=='on'}
 function locCard(){const off=loc==='off';return `<section class="loccard"><span class="lc-i">${ico(off?'map-pin-off':'locate-fixed')}</span>
- <div class="lc-c"><h2 class="h3">${off?'Location’s off':'Gyms near you'}</h2><p>${off?'Search by postcode instead.':'See what’s close and how busy.'}</p></div>
- ${off?`<button class="btn btn-tonal btn-sm" onclick="goOb('find')">Search</button>`:`<button class="btn btn-primary btn-sm" onclick="askLoc()">Share location</button>`}</section>`}
+ <div class="lc-c"><h2 class="h3">${off?'Location’s off':'Gyms near you'}</h2><p>${off?'Choose a gym to look around.':'See what’s close and how busy.'}</p></div>
+ ${off?`<button class="btn btn-tonal btn-sm" onclick="switchGym()">Choose</button>`:`<button class="btn btn-primary btn-sm" onclick="askLoc()">Share location</button>`}</section>`}
 function askLoc(onYes,onNo){if(loc==='off'){return modal('Location is turned off.','Settings',`<p class="body">To see gyms near you, turn on location for The Gym Group in your iPhone Settings.</p><div class="note">${ico('info')}<span>Settings › Privacy & Security › Location Services › The Gym Group › While Using the App</span></div>`,
   `<button class="btn btn-primary" onclick="closeModal();toast('Opens iPhone Settings')">Open Settings</button><button class="btn btn-tonal" onclick="closeModal();goOb('find')">Search by postcode</button>`)}
  const d=$('#device'),el=document.createElement('div');el.className='sysalert';el.setAttribute('role','alertdialog');el.setAttribute('aria-modal','true');el.setAttribute('aria-labelledby','sa-t');
@@ -2154,7 +2164,7 @@ function gate(kind){const w={entry:['Gym entry comes with a membership.','Join t
   <div class="card" style="display:flex;flex-direction:column;gap:12px"><div class="lockrow">${ico('scan-line')}Scan-in gym entry</div><div class="lockrow">${ico('calendar-days')}Class booking</div><div class="lockrow">${ico('users')}Guest passes</div></div>
   <p class="fine">Everything else, like workouts, Gym Buddy and busy times, is free to explore.</p>`,
  `<button class="btn btn-primary" onclick="closeModal();if(noGym){goOb('find')}else{planBack=ob||'find';goOb('plans')}">${noGym?'Find a gym':'See memberships'} ${ico('arrow-right')}</button><button class="btn btn-tonal" onclick="closeModal()">Keep exploring</button>`)}
-function guestBanner(){if(noLoc())return '';return `<section class="guestcard"><span class="eyebrow">Exploring as a guest</span><h2 class="display d-card">Like what you see?</h2><p>${noGym?'Find a gym near you to unlock gym entry, class booking and guest passes.':'Join '+esc(homeGym)+' to unlock gym entry, class booking and guest passes.'}</p><button class="btn btn-green btn-sm" style="min-height:48px" onclick="${noGym?'goOb(\'find\')':'planBack=\'find\';goOb(\'plans\')'}">${noGym?ico('map-pin')+' Find a gym':'See memberships '+ico('arrow-right')}</button></section>`}
+function guestBanner(){return `<section class="guestcard gc-blue"><span class="eyebrow">Exploring as a guest</span><h2 class="display d-card">Like what you see?</h2><p>${noLoc()?'Find a gym near you to unlock gym entry, class booking and guest passes.':'Join '+esc(homeGym)+' to unlock gym entry, class booking and guest passes.'}</p><button class="btn btn-green btn-sm" style="min-height:48px" onclick="${noLoc()?'goOb(\'find\')':'planBack=\'find\';goOb(\'plans\')'}">${noLoc()?ico('map-pin')+' Find a gym':'See memberships '+ico('arrow-right')}</button></section>`}
 
 /* ---------- classes tab ---------- */
 let cDay=1,cCat='All';
