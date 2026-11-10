@@ -1604,11 +1604,11 @@ function goalPrompt(){return `<section class="goalprompt" aria-labelledby="gpt">
 function startGuide(){return !!(member&&state.isNew&&!state.returning&&!state.visits&&(!state.goals||state.goals.level==='new'))}
 function startCard(){const k=state.kick&&state.kick.time?state.kick:null,S=[
  {d:!!(state.fvPlanned||k),t:'Plan your first visit',s:'When to come, how to get in and what to expect.',a:'openGuide()',c:'Plan your first visit'},
- {d:!!k,t:k?'Kickstart booked':'Book a Kickstart session',s:k?`${k.day}, ${k.time} with ${k.who}. Tap to change or cancel`:'Free 30 minutes with a trainer. Optional.',a:k?'kickManage()':"openGuide();GV='kick';drawGuide(true)",c:'Book a Kickstart'},];
+ {d:!!k,t:k?'Kickstart booked':'Book a Kickstart session',s:k?`${k.day}, ${k.time} with ${k.who}. Tap to change or cancel`:'Free 30 minutes with a trainer. Optional.',a:k?'kickManage()':"openGuide();GV='kick';drawGuide(true)",c:'Book a Kickstart'}].filter((x,i)=>i===0||(state.goals&&state.goals.level==='new')||k);
  const n=S.filter(x=>x.d).length,nx=S.findIndex(x=>!x.d),cta=S[nx]&&S[nx].a?S[nx]:null;
  return `<section class="hero navy fvcard sgcard" aria-labelledby="sg-h"><img src="${IMG.liftcard}" alt="" aria-hidden="true">
  <div class="copy"><span class="tag">Get started</span><h2 class="display d-hero sg-sans" id="sg-h">${k?'Day one. Sorted.':'Let’s make day one easy.'}</h2>
- <ol class="sg-steps" aria-label="${n} of 2 done">${S.map((x,i)=>{const cls='sg-step'+(x.d?' done':'')+(i===nx?' next':''),inner=`<span class="n">${x.d?ico('check'):i+1}</span><span class="t"><b>${x.t}${x.d?'<span class="sr-only"> (done)</span>':''}</b><small>${x.s}</small></span>`;return `<li>${x.a?`<button class="${cls}" onclick="${x.a}">${inner}${ico('chevron-right')}</button>`:`<div class="${cls}">${inner}</div>`}</li>`}).join('')}</ol>
+ <ol class="sg-steps" aria-label="${n} of ${S.length} done">${S.map((x,i)=>{const cls='sg-step'+(x.d?' done':'')+(i===nx?' next':''),inner=`<span class="n">${x.d?ico('check'):i+1}</span><span class="t"><b>${x.t}${x.d?'<span class="sr-only"> (done)</span>':''}</b><small>${x.s}</small></span>`;return `<li>${x.a?`<button class="${cls}" onclick="${x.a}">${inner}${ico('chevron-right')}</button>`:`<div class="${cls}">${inner}</div>`}</li>`}).join('')}</ol>
  </div></section>`}
 function fvBody(){const W=workouts.filter(w=>w.level==='Beginner'||w.level==='All levels').slice(0,3);
  return `<div class="fv-q"><h3>Which day?</h3><div class="chips fv-chips">${FV_DAYS.map((d,i)=>`<button class="chip" aria-pressed="${FV.d===i}" onclick="FV.d=${i};drawGuide()">${d}</button>`).join('')}</div></div>
