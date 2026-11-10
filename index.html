@@ -1791,7 +1791,7 @@ function home(){if(member&&state.home&&state.home.focus)return focusHome();const
 ${noLoc()?locCard():''}
 ${member&&!sg?busycard():''}
  ${member&&!sg&&state.isNew&&!state.returning&&!state.goals&&!state.home?goalPrompt():''}
-${member?budCard():''}${back?(state.lapsed?lapsedCard():'')+(newbie()?firstCard():'')+planJourneyCard()+(state.plan&&state.plan.plen?'':homeWeek()+(state.plan?planWeekCard():''))+wkPicked()+upNext(false)+(tier()==='Ultimate'?ultHome():''):''}
+${member?budCard():''}${back?(state.lapsed?lapsedCard():'')+(newbie()?firstCard():'')+planJourneyCard()+(state.plan&&state.plan.plen?'':homeWeek()+(state.plan?planWeekCard():''))+wkPicked()+upNext(false)+(tier()==='Ultimate'?ultHome():addonRail()):''}
  ${member&&!back&&!sg?planJourneyCard():''}${sg?startCard()+(!state.goals&&!state.home?goalPrompt():'')+busycard():member&&newbie()?(back?'':firstCard()):member&&!back?wkPicked():member?'':planner()}
  ${member?'':busycard()}
  ${member&&brandNew()?firstClasses()+upNext(false):''}
@@ -1877,7 +1877,7 @@ function offerspage(){const cats=['All',...new Set(OFFERS.map(o=>o[2]))],L=OFFER
  <p class="fine">New offers land on the 1st of every month. Terms apply to each offer.</p>`}
 function perkspage(){const ult=member&&tier()==='Ultimate';return `<button class="link" style="align-self:flex-start;margin:-8px 0 -12px" onclick="navigate(prevPage&&prevPage!=='perks'?prevPage:'you')">${ico('arrow-left')} Back</button><div class="greet"><div class="eyebrow">${ult?'Ultimate member':'More than your membership'}</div><h1 class="display d-title">Good things come in groups.</h1><p class="body">${ult?'You’re on Ultimate. Here’s everything that comes with it, and how to use it.':'A little extra to make your membership feel even better.'}</p></div>
  ${ult?ultValue():''}
- ${member&&!ult?addonRail():`<section class="pk-recover"><div class="pk-img"><img src="${IMG.calm}" alt="A member relaxing after a workout"><span class="tag">${ult?'Included with Ultimate':member?'Add to your visit':'Ultimate perk'}</span></div>
+ ${`<section class="pk-recover"><div class="pk-img"><img src="${IMG.calm}" alt="A member relaxing after a workout"><span class="tag">${ult?'Included with Ultimate':member?'Add to your visit':'Ultimate perk'}</span></div>
   <div class="pk-body"><h2 class="display d-card">${ult||!member?'Sauna and massage, on us.':'Sauna and massage, when you want them.'}</h2><p class="meta">Recovery is part of the plan. Unwind after a session at ${esc(homeGym)}.</p>
   ${ult||!member?'':`<span class="pk-addtag">Add-ons</span>`}${ult?`<div class="pk-list">${pkRow('sauna')}${pkRow('massage')}</div>`:member?`<div class="pk-list">${pkRow('sauna')}${pkRow('massage')}</div><div class="pk-up">${ico('sparkles')}<span>Get unlimited saunas and a free monthly massage with Ultimate. It’s £5 more a month.</span></div><button class="link" onclick="upgradeUlt()">See Ultimate ${ico('arrow-right')}</button>`:`<div class="pk-lock">${ico('lock')}<span>Free saunas and a monthly sports massage come with Ultimate. It’s £5 more a month.</span></div><button class="btn btn-primary" onclick="upgradeUlt()">See Ultimate ${ico('arrow-right')}</button>`}</div></section>`}
  ${ult?`<div class="sechead"><h2 class="h2">Also with Ultimate</h2></div>
