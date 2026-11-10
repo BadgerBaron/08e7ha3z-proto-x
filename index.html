@@ -104,7 +104,7 @@ h1,h2,h3,p{margin:0}
 .fab .ico{font-size:22px;color:var(--electric-green)}
 .fab:active{transform:scale(.97)}
 @media (max-width:600px),(hover:none) and (pointer:coarse){.fab{right:max(16px,env(safe-area-inset-right,0px))}}
-.ytop{position:sticky;top:0;z-index:6;display:flex;align-items:center;gap:10px;margin:-4px -20px -16px;padding:10px 20px 28px;background:linear-gradient(180deg,var(--body) 0%,var(--body) 55%,color-mix(in srgb,var(--body) 0%,transparent) 100%);pointer-events:none}.ytop>*{pointer-events:auto}.ytop span{font-size:15px;font-weight:700;color:var(--ink-2)}
+.ytop{position:sticky;top:0;z-index:6;display:flex;align-items:center;gap:10px;margin:-32px -20px -16px;padding:10px 20px 28px;background:linear-gradient(180deg,var(--body) 0%,var(--body) 55%,color-mix(in srgb,var(--body) 0%,transparent) 100%);pointer-events:none}.ytop>*{pointer-events:auto}.ytop span{font-size:15px;font-weight:700;color:var(--ink-2)}
 .avatar{font-size:14px;font-weight:700;background:#192901;border-color:#192901;color:#B2FF00}
 
 /* buttons */
@@ -1896,7 +1896,7 @@ function youBack(){const t=prevPage&&prevPage!=='you'?prevPage:'home',L={home:'H
 function youpage(){if(!member)return guestYou();return `${youBack()}<div class="greet"><div class="eyebrow">All about you</div><h1 class="display d-title">Hey, ${esc(fname())}.</h1><p class="body">Your membership, your preferences, your way.</p></div>
  <section class="membercard" style="${tierBg(tier())}"><div class="top"><img src="${MARK_WHITE}" alt="The Gym Group"><span class="badge" style="background:#001042B3;color:#fff">${!member?'Guest · not a member yet':state.cancelled?'Ends 30 Nov':state.paused?'Paused':tier()}</span></div>
   <div><div class="h2">${esc(homeGym)}</div><p>Member since ${state.isNew?'November':'October'} 2026</p></div></section>
- <button class="buddy perkcard" style="background-image:linear-gradient(90deg,#001042E6 0%,#00104299 55%,#00104226 100%),url(${IMG.txp8})" onclick="navigate('perks')"><span class="bi" style="background:var(--electric-green);color:#001042">${ico('gift')}</span><span><span class="h3" style="display:block">Your perks</span><p>${tier()==='Ultimate'?'Saunas, massages, guest passes and more.':'Guest passes, member offers and more.'}</p></span><span class="go">${ico('chevron-right')}</span></button>
+ <button class="buddy perkcard" style="background-image:linear-gradient(90deg,#00104299 0%,#00104226 60%,#00104200 100%),url(${IMG.fleckmid});background-size:cover;background-position:center" onclick="navigate('perks')"><span class="bi" style="background:var(--electric-green);color:#001042">${ico('gift')}</span><span><span class="h3" style="display:block">Your perks</span><p>${tier()==='Ultimate'?'Saunas, massages, guest passes and more.':'Guest passes, member offers and more.'}</p></span><span class="go">${ico('chevron-right')}</span></button>
  <div class="group">
   <button class="row" onclick="openPers()"><span class="rl"><span class="ri">${ico('sliders-horizontal')}</span>Personalise your home</span><span class="rv">${state.home?'Edit':'Set up'}${ico('chevron-right')}</span></button>
   <button class="row" onclick="openGoals()"><span class="rl"><span class="ri">${ico('target')}</span>Your fitness goals</span><span class="rv">${state.goals?'Edit':'Set up'}${ico('chevron-right')}</span></button>
