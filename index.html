@@ -1023,6 +1023,8 @@ button.sg-step{cursor:pointer}
 .fv-acts{display:flex;flex-wrap:wrap;align-items:center;column-gap:16px;row-gap:2px;margin-top:6px}
 .fv-acts .link{white-space:nowrap}
 .fv-acts .btn{margin-top:0}
+.sgcard .d-hero.sg-sans{font-family:var(--font-body);font-weight:700;text-transform:none;font-size:34px;line-height:1.08;letter-spacing:-.02em}
+.ob-welcome .d-splash.wl-sans{font-family:var(--font-body);font-weight:700;text-transform:none;font-size:48px;line-height:1.02;letter-spacing:-.025em}
 .fclass{position:relative;background:#B1F902 center bottom/cover no-repeat;color:var(--navy);border-radius:var(--r-card);padding:20px 18px 18px;display:flex;flex-direction:column;gap:14px;overflow:hidden}
 .fclass .fc-x{position:absolute;top:10px;right:10px;width:44px;height:44px;border-radius:50%;display:grid;place-items:center;color:var(--navy);background:#0010421A}.fclass .fc-x svg{width:18px;height:18px}
 .fclass .fc-tag{display:inline-block;padding:5px 11px;border-radius:999px;border:1.5px solid var(--navy);font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;margin-bottom:10px}
@@ -1034,6 +1036,8 @@ button.sg-step{cursor:pointer}
 .fclass p{font-size:14px;line-height:1.45;color:var(--navy);margin-top:6px}
 .fclass .foryou .ctl{box-shadow:0 2px 8px #0010421F;border:0;background:#fff}
 .fclass .link{color:var(--navy)}
+.fclass .fc-cta{align-self:flex-start;background:var(--navy);color:#fff;min-height:48px;padding:0 22px;margin-top:4px}
+.fclass{min-height:250px}
 .fclass .link{align-self:flex-start}
 .kick{background:var(--navy);color:#fff;border-radius:var(--r-card);padding:20px;display:flex;flex-direction:column;gap:12px;margin-top:10px;position:relative;overflow:hidden}
 .kick::after{display:none}
@@ -1578,13 +1582,9 @@ function brandNew(){return member&&state.isNew&&!state.visits}
 const WHY_CAT={'Get stronger':'Strength','Get fitter':'Cardio','Feel fitter':'Cardio','Manage my weight':'Cardio','Lose weight':'Cardio','Feel good':'Mind and body','Move better':'Mind and body','Train for an event':'Cardio'};
 function classWish(){const g=state.goals,h=state.home||{};if(!g)return null;const cl=(g.likes&&g.likes.length)||(g.why||[]).includes('Train with others')||(h.help||[]).includes('starter')||(g.level==='new'&&(g.why||[]).some(w=>WHY_CAT[w]));if(!cl)return null;
  const cats=g.likes&&g.likes.length?g.likes:[...new Set((g.why||[]).map(w=>WHY_CAT[w]).filter(Boolean))];return cats.length?cats:['Strength','Cardio','Mind and body']}
-function firstClasses(){const wish=classWish();if(!wish||state.fcOff||booked.size)return '';const easy=state.goals.level==='pro'?Object.keys(CATS):['Core and stretch','Bodyweight burn','Yoga flow','Kettlebell basics','Fresh start','Spin'];const likes=wish;const out=[];
- for(let d=1;d<7&&out.length<2;d++)classesFor(d).forEach(x=>{if(out.length<2&&easy.includes(x.c[0])&&x.left&&(!likes||likes.includes(CATS[x.c[0]])))out.push({...x,d})});
- if(out.length<2)for(let d=1;d<7&&out.length<2;d++)classesFor(d).forEach(x=>{if(out.length<2&&likes.includes(CATS[x.c[0]])&&x.left&&!out.find(o=>o.id===x.id))out.push({...x,d})});
- if(!out.length)return '';
- return `<section class="fclass" aria-labelledby="fct" style="background-image:url(${IMG.liftlime})"><button class="fc-x" aria-label="Dismiss class suggestions" onclick="state.fcOff=true;persist();render()">${ico('x')}</button><div class="fc-head"><div><span class="fc-tag">Your first class</span><h2 class="h2" id="fct">Try a class on your first visit</h2><p>Someone shows you what to do, and everyone’s finding their feet together. All levels welcome.</p></div></div>
- <div class="foryou">${out.map(x=>ctlRow(x).replace('<div class="ct"><b>'+x.tm+'</b>','<div class="ct"><b>'+x.tm+'</b><span>'+dayLabel(x.d)+'</span>').replace('<span>'+x.c[1]+'</span></div>','</div>')).join('')}</div>
- <button class="link" onclick="navigate('classes')">See all classes ${ico('arrow-right')}</button></section>`}
+function firstClasses(){const wish=classWish();if(!wish||state.fcOff||booked.size)return '';
+ return `<section class="fclass" aria-labelledby="fct" style="background-image:url(${IMG.liftlime})"><button class="fc-x" aria-label="Dismiss" onclick="state.fcOff=true;persist();render()">${ico('x')}</button><div class="fc-head"><div><span class="fc-tag">Your first class</span><h2 class="h2" id="fct">Try a class on your first visit</h2><p>Someone shows you what to do, and everyone’s finding their feet together. All levels welcome.</p></div></div>
+ <button class="btn fc-cta" onclick="navigate('classes')">Book a class ${ico('arrow-right')}</button></section>`}
 function newbie(){return !!(state.goals&&state.goals.level==='new'&&!state.visits)}
 const FV_DAYS=['Today','Tomorrow','Fri 6','Sat 7','Sun 8','Mon 9','Tue 10'];
 const FV_SLOTS=[['7–8am','Quiet'],['12–1pm','Quietest'],['2–3pm','Quiet'],['6–7pm','Busy']];
@@ -1600,7 +1600,7 @@ function startCard(){const k=state.kick&&state.kick.time?state.kick:null,S=[
  {d:!!k,t:'Book a Kickstart session',s:k?`${k.day}, ${k.time} with ${k.who}`:'Free 30 minutes with a trainer. Optional.',a:"openGuide();GV='kick';drawGuide(true)",c:'Book a Kickstart'},];
  const n=S.filter(x=>x.d).length,nx=S.findIndex(x=>!x.d),cta=S[nx]&&S[nx].a?S[nx]:null;
  return `<section class="hero navy fvcard sgcard" aria-labelledby="sg-h"><img src="${IMG.liftcard}" alt="" aria-hidden="true">
- <div class="copy"><span class="tag">Get started</span><h2 class="display d-hero" id="sg-h">${k?'Day one. Sorted.':'Let’s make day one easy.'}</h2>
+ <div class="copy"><span class="tag">Get started</span><h2 class="display d-hero sg-sans" id="sg-h">${k?'Day one. Sorted.':'Let’s make day one easy.'}</h2>
  <ol class="sg-steps" aria-label="${n} of 2 done">${S.map((x,i)=>{const cls='sg-step'+(x.d?' done':'')+(i===nx?' next':''),inner=`<span class="n">${x.d?ico('check'):i+1}</span><span class="t"><b>${x.t}${x.d?'<span class="sr-only"> (done)</span>':''}</b><small>${x.s}</small></span>`;return `<li>${x.a?`<button class="${cls}" onclick="${x.a}">${inner}${ico('chevron-right')}</button>`:`<div class="${cls}">${inner}</div>`}</li>`}).join('')}</ol>
  </div></section>`}
 function fvBody(){const W=workouts.filter(w=>w.level==='Beginner'||w.level==='All levels').slice(0,3);
@@ -1767,15 +1767,12 @@ function home(){if(member&&state.home&&state.home.focus)return focusHome();const
 ${noLoc()?locCard():''}
 ${member&&!sg?busycard():''}
  ${member&&!sg&&!state.goals&&!state.home?goalPrompt():''}
-${member?budCard():''}${back?(state.lapsed?lapsedCard():'')+(newbie()?firstCard():'')+planJourneyCard()+homeWeek()+(state.plan?planWeekCard():'')+upNext()+(tier()==='Ultimate'?ultHome():''):''}
- ${member&&!back&&!sg?planJourneyCard():''}${sg?startCard()+(!state.goals&&!state.home?goalPrompt():'')+busycard():member&&newbie()?(back?'':firstCard()):member?`<section class="hero"><img src="${IMG.herocycle}" alt="Smiling member on a spin bike"><span class="spark" aria-hidden="true"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round"><path d="M12 3v18M3 12h18M5.6 5.6l12.8 12.8M18.4 5.6 5.6 18.4"/></svg></span>
-  ${(()=>{const h=heroPick(),C={0:['Less overthinking. More doing.','Your next workout, sorted. A friendly plan to help you find your feet.'],1:['Back in the swing.','Start where you are. A feel-good full-body session, no catching up required.'],2:['Stronger, your way.','A proper full-body strength session. Swap kit whenever you need to.']}[h.id];return `<div class="copy"><span class="tag">${state.goals?'Picked for your goals':'A good place to start'}</span><h2 class="display d-hero">${C[0]}</h2>
-  <p>${C[1]}</p>
-  <button class="btn btn-green btn-sm" style="min-height:48px" onclick="detail(${h.id})">`})()}Let’s get moving ${ico('arrow-right')}</button></div></section>`:planner()}
+${member?budCard():''}${back?(state.lapsed?lapsedCard():'')+(newbie()?firstCard():'')+wkPicked()+planJourneyCard()+homeWeek()+(state.plan?planWeekCard():'')+upNext(false)+(tier()==='Ultimate'?ultHome():''):''}
+ ${member&&!back&&!sg?planJourneyCard():''}${sg?startCard()+(!state.goals&&!state.home?goalPrompt():'')+busycard():member&&newbie()?(back?'':firstCard()):member&&!back?wkPicked():member?'':planner()}
  ${member?'':busycard()}
- ${member&&brandNew()?firstClasses():''}
+ ${member&&brandNew()?firstClasses()+upNext(false):''}
  ${back?'':member?homeWeek():''}
-${back?'':`<div class="sechead"><h2 class="h2">${state.goals?'Picked for your goals':'A little direction?'}</h2><button class="link" onclick="navigate('workouts')">All workouts ${ico('arrow-right')}</button></div>
+${back||(member&&!startGuide())?'':`<div class="sechead"><h2 class="h2">${state.goals?'Picked for your goals':'A little direction?'}</h2><button class="link" onclick="navigate('workouts')">All workouts ${ico('arrow-right')}</button></div>
  <div class="rail">${pickedWorkouts().slice(0,4).map(card).join('')}</div>`}
  ${member&&!back&&!brandNew()?classesForYou():''}
  ${member?offerscard():friendhero()}
@@ -2359,7 +2356,7 @@ GYMS.forEach(g=>{g.d=(g.dm<0.95?g.dm.toFixed(1):g.dm<10?g.dm.toFixed(1):Math.rou
  const P=g.n==='London Peckham Rye'?[50.2,66.5,0]:g.n==='London Camberwell'?[4,30,1]:g.n==='London Loughborough Junction'?[4,12,1]:g.n==='London Old Kent Road'?[96,10,1]:null;if(P){g.x=P[0];g.y=P[1];if(P[2])g.edge=1}else g.far=1});
 let member=false,homeGym='London Peckham Rye';
 function obWelcome(){return `<img class="obimg" src="${IMG.friends}" alt="Three friends laughing together at the gym"><img class="oblogo" src="${LOGO_STACKED}" alt="The Gym Group">
- <div class="obcopy"><span class="tag">Welcome</span><h1 class="display d-splash">Find your kind of gym.</h1>
+ <div class="obcopy"><span class="tag">Welcome</span><h1 class="display d-splash wl-sans">Find your kind of gym.</h1>
  <p>Friendly gyms, flexible memberships and a plan to help you find your feet.</p>
  <div class="btns"><button class="btn btn-primary" onclick="state.returning=false;goOb('find')">${ico('map-pin')} Find a gym</button><button class="btn btn-outline-w" onclick="goOb('signin')">Sign in</button></div>
  <button class="link" onclick="state.returning=false;explore(true)">Just looking? Explore the app</button></div>`}
@@ -2763,6 +2760,7 @@ function recWorkouts(n){const g=state.goals||{why:[],level:''};return [...workou
 function recBasis(){const g=state.goals,t=[];if(g){(g.why||[]).slice(0,2).forEach(x=>t.push(x));const lv={new:'New to it',back:'Getting back into it',pro:'Knows the ropes'}[g.level];if(lv)t.push(lv)}const sl=state.plan?state.plan.slot:state.prefSlot;if(sl)t.push(sl+'s');return t}
 function recClassRows(C){return C.map(x=>ctlRow(x).replace('<div class="ct"><b>'+x.tm+'</b>','<div class="ct"><b>'+x.tm+'</b><span>'+dayLabel(x.d)+'</span>').replace('<span>'+x.c[1]+'</span></div>','</div>')).join('')}
 function recWorkoutCards(W){return W.map(({w,why})=>card(w).replace('<div class="wbody">',`<div class="wbody">${why.length?`<span class="pfy-chip">${ico('sparkles')}${why[0]}</span>`:''}`)).join('')}
+function wkPicked(){const W=recWorkouts(3);return W.length?`<div class="sechead"><h2 class="h2">Workouts picked for you</h2><button class="link" onclick="navigate('workouts')">View all ${ico('arrow-right')}</button></div><div class="rail">${recWorkoutCards(W)}</div>`:''}
 function pickedForYou(withW){const C=recClasses(2),W=withW?recWorkouts(3):[];
  return `${C.length?`<div class="sechead"><h2 class="h2">Classes picked for you</h2><button class="link" onclick="navigate('classes')">View all ${ico('arrow-right')}</button></div><div class="foryou">${recClassRows(C)}</div>`:''}
  ${W.length?`<div class="sechead"><h2 class="h2">Workouts picked for you</h2><button class="link" onclick="navigate('workouts')">View all ${ico('arrow-right')}</button></div><div class="rail">${recWorkoutCards(W)}</div>`:''}`}
