@@ -1791,7 +1791,7 @@ function home(){if(member&&state.home&&state.home.focus)return focusHome();const
 ${noLoc()?locCard():''}
 ${member&&!sg?busycard():''}
  ${member&&!sg&&state.isNew&&!state.returning&&!state.goals&&!state.home?goalPrompt():''}
-${member?budCard():''}${back?(state.lapsed?lapsedCard():'')+(newbie()?firstCard():'')+planJourneyCard()+(state.plan&&state.plan.plen?'':homeWeek()+(state.plan?planWeekCard():''))+wkPicked()+upNext(false)+(tier()==='Ultimate'?ultHome():addonRail()):''}
+${member?budCard():''}${back?(state.lapsed?lapsedCard():'')+(newbie()?firstCard():'')+planJourneyCard()+(state.plan&&state.plan.plen?'':homeWeek()+(state.plan?planWeekCard():''))+wkPicked()+upNext(false):''}
  ${member&&!back&&!sg?planJourneyCard():''}${sg?startCard()+(!state.goals&&!state.home?goalPrompt():'')+busycard():member&&newbie()?(back?'':firstCard()):member&&!back?wkPicked():member?'':planner()}
  ${member?'':busycard()}
  ${member&&brandNew()?firstClasses()+upNext(false):''}
@@ -1799,7 +1799,7 @@ ${member?budCard():''}${back?(state.lapsed?lapsedCard():'')+(newbie()?firstCard(
 ${back||(member&&!startGuide())?'':`<div class="sechead"><h2 class="h2">${state.goals?'Picked for your goals':'A little direction?'}</h2><button class="link" onclick="navigate('workouts')">All workouts ${ico('arrow-right')}</button></div>
  <div class="rail">${pickedWorkouts().slice(0,4).map(card).join('')}</div>`}
  ${member&&!back&&!brandNew()?classesForYou():''}
- ${member?offerscard():friendhero()}
+ ${member?addonRail():friendhero()}
  ${member?'':guestBanner()}
  ${member?`<button class="link pz-edit" onclick="openPers()">${ico('sliders-horizontal')} Personalise your home</button>`:''}
  <p class="signoff">For every group, there’s <b>The Gym Group</b>.</p>`}
@@ -1848,8 +1848,9 @@ const PK={sauna:{t:'Sauna',ico:'flame',title:'Book a sauna.',with:'30-minute ses
 const PKDAYS=['Today','Tomorrow','Sat 7 Nov'];
 function perkUse(){return state.perkUse||{sauna:0,massage:0,guest:0}}
 function addonRail(){const C=[['sauna','calm','A warm 30-minute sauna after your session'],['massage','stretch','30 minutes with a sports massage therapist']];
- return `<div class="sechead"><h2 class="h2">Suggested add-ons</h2><span class="meta">Pay as you go</span></div><div class="rail adr">${C.map(([k,im,d])=>{const p=PK[k],b=(state.perks||{})[k];return `<article class="adc"><div class="adc-img"><img src="${IMG[im]}" alt=""><span class="tag">Add-on</span></div><div class="adc-b"><b>${p.t}</b><p>${d}</p><div class="adc-f"><span class="adc-p">${b?`${ico('circle-check')}${esc(b.d)}, ${esc(b.t)}`:'£'+PKADD[k][0]}</span><button class="btn ${b?'btn-tonal':'btn-primary'} btn-sm" onclick="bookPerk('${k}')">${b?'Change':'Add'}</button></div></div></article>`}).join('')}
- <article class="adc adc-ult" style="background-image:linear-gradient(180deg,#0035D6B3,#001042E6),url(${IMG.momult})"><span class="tag">Ultimate</span><b>Get them all included</b><p>Unlimited saunas, a free monthly massage, guest passes and every gym. £5 more a month.</p><button class="btn btn-green btn-sm" onclick="upgradeUlt()">See Ultimate ${ico('arrow-right')}</button></article></div>`}
+ const ult=tier()==='Ultimate',u=perkUse();
+ return `<div class="sechead"><h2 class="h2">${ult?'Book your perks':'Suggested add-ons'}</h2><span class="meta">${ult?'Included with Ultimate':'Pay as you go'}</span></div><div class="rail adr">${C.map(([k,im,d])=>{const p=PK[k],b=(state.perks||{})[k],used=ult&&k==='massage'&&u.massage>=1&&!b;return `<article class="adc"><div class="adc-img"><img src="${IMG[im]}" alt=""><span class="tag">${ult?'Included':'Add-on'}</span></div><div class="adc-b"><b>${p.t}</b><p>${ult?(k==='sauna'?'Unlimited 30-minute sessions':'One free 30-minute massage a month'):d}</p><div class="adc-f"><span class="adc-p">${b?`${ico('circle-check')}${esc(b.d)}, ${esc(b.t)}`:ult?(used?'Next one 1 December':'Free'):'£'+PKADD[k][0]}</span>${used?'':`<button class="btn ${b?'btn-tonal':'btn-primary'} btn-sm" onclick="bookPerk('${k}')">${b?'Change':ult?'Book':'Add'}</button>`}</div></div></article>`}).join('')}
+ ${ult?'':`<article class="adc adc-ult" style="background-image:linear-gradient(180deg,#0035D6B3,#001042E6),url(${IMG.momult})"><span class="tag">Ultimate</span><b>Get them all included</b><p>Unlimited saunas, a free monthly massage, guest passes and every gym. £5 more a month.</p><button class="btn btn-green btn-sm" onclick="upgradeUlt()">See Ultimate ${ico('arrow-right')}</button></article>`}</div>`}
 const PKADD={sauna:[4,'£4 a 30-minute session'],massage:[25,'£25 for 30 minutes']};
 function pkRow(k){const p=PK[k],b=(state.perks||{})[k],u=perkUse();const left=k==='massage'?Math.max(0,1-u.massage):null;
  if(tier()!=='Ultimate')return `<div class="pk-row"><span class="pk-i">${ico(p.ico)}</span><span class="pk-c"><b>${p.t}</b><small>${b?`<span class="pk-ok">${ico('circle-check')}Booked · ${esc(b.d)}, ${esc(b.t)}</span>`:PKADD[k][1]}</small></span>${b?`<button class="btn btn-tonal btn-sm" onclick="bookPerk('${k}')">Change</button>`:`<button class="btn btn-primary btn-sm" onclick="bookPerk('${k}')">Add</button>`}</div>`;
