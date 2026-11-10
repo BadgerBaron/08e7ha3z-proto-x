@@ -1780,7 +1780,7 @@ function focusHome(){const C={busy:()=>busycard(),plan:()=>state.plan?planJourne
 function home(){if(member&&state.home&&state.home.focus)return focusHome();const back=member&&!state.isNew,sg=startGuide();return `
 ${noLoc()?locCard():''}
 ${member&&!sg?busycard():''}
- ${member&&!sg&&!state.goals&&!state.home?goalPrompt():''}
+ ${member&&!sg&&state.isNew&&!state.returning&&!state.goals&&!state.home?goalPrompt():''}
 ${member?budCard():''}${back?(state.lapsed?lapsedCard():'')+(newbie()?firstCard():'')+planJourneyCard()+wkPicked()+(state.plan&&state.plan.plen?'':homeWeek()+(state.plan?planWeekCard():''))+upNext(false)+(tier()==='Ultimate'?ultHome():''):''}
  ${member&&!back&&!sg?planJourneyCard():''}${sg?startCard()+(!state.goals&&!state.home?goalPrompt():'')+busycard():member&&newbie()?(back?'':firstCard()):member&&!back?wkPicked():member?'':planner()}
  ${member?'':busycard()}
