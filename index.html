@@ -1528,7 +1528,7 @@ function busycard(){const nowIdx=7,qt=(GYMS.find(g=>g.n===homeGym)||GYMS[0]).q;i
   <div class="bars" aria-hidden="true">${BUSY.map((n,i)=>`<i class="${i===nowIdx?'now':n>80?'peak':''}" style="height:${n}%"></i>`).join('')}</div>
   <div class="barlabels num" aria-hidden="true"><span>6am</span><span>Now</span><span>8pm</span></div>
   <button class="link" onclick="switchGym()">Pick a gym to see it live ${ico('arrow-right')}</button></section>`;return `<section class="card" aria-labelledby="bz">
-  <div class="busyhead"><h2 class="h2" id="bz" style="font-size:20px">${qt?'Nice and quiet':'Picking up'}</h2><span class="badge live">Live</span></div>${member?gymFacts():''}
+  <div class="busyhead"><h2 class="h2" id="bz" style="font-size:20px">${qt?'Nice and quiet':'Picking up'}</h2><span class="badge live">Live</span></div>
   <p class="meta num" style="margin-top:4px">${qt?32:64} people in ${member?'right now':esc(homeGym.replace('London ',''))+' right now'}</p>
   <div class="bars" aria-hidden="true">${BUSY.map((n,i)=>{const v=qt?n:Math.min(95,n+(i<=nowIdx+2?26:6));return `<i class="${i===nowIdx?'now':v>80?'peak':''}" style="height:${v}%"></i>`}).join('')}</div>
   <div class="barlabels num" aria-hidden="true"><span>6am</span><span>Now</span><span>8pm</span></div>
@@ -1600,7 +1600,9 @@ function classWish(){const g=state.goals,h=state.home||{};if(!g)return null;cons
  const cats=g.likes&&g.likes.length?g.likes:[...new Set((g.why||[]).map(w=>WHY_CAT[w]).filter(Boolean))];return cats.length?cats:['Strength','Cardio','Mind and body']}
 function firstClasses(){const wish=classWish();if(!wish||state.fcOff||booked.size)return '';
  return `<section class="fclass" aria-labelledby="fct" style="background-image:url(${IMG.liftolive})"><button class="fc-x" aria-label="Dismiss" onclick="state.fcOff=true;persist();render()">${ico('x')}</button><div class="fc-head"><div><span class="fc-tag">Your first class</span><h2 class="h2" id="fct">Try a class on your first visit</h2><p>Someone shows you what to do, and everyone’s finding their feet together. All levels welcome.</p></div></div>
- <button class="btn fc-cta" onclick="navigate('classes')">Book a class ${ico('arrow-right')}</button></section>`}
+ <button class="btn fc-cta" onclick="firstClassSheet()">Pick a class ${ico('arrow-right')}</button></section>`}
+function firstClassSheet(){const easy=['Core and stretch','Bodyweight burn','Yoga flow','Kettlebell basics','Fresh start','Spin'],out=[];for(let d=1;d<7&&out.length<5;d++)classesFor(d).forEach(x=>{if(out.length<5&&easy.includes(x.c[0])&&x.left)out.push({...x,d})});
+ const any=out.some(x=>booked.has(x.id));modal('Pick your first class.','Beginner friendly',`<div class="fcs"><p class="body">All levels welcome. The instructor shows you what to do, and you can cancel any time.</p><div class="foryou" style="margin-top:12px">${recClassRows(out.map(x=>({...x,why:[]})))}</div></div>`,any?`<button class="btn btn-primary" onclick="closeModal()">Done</button>`:`<button class="link" style="align-self:center" onclick="closeModal();navigate('classes')">See the full timetable ${ico('arrow-right')}</button>`)}
 function newbie(){return !!(state.goals&&state.goals.level==='new'&&!state.visits)}
 const FV_DAYS=['Today','Tomorrow','Fri 6','Sat 7','Sun 8','Mon 9','Tue 10'];
 const FV_SLOTS=[['7–8am','Quiet'],['12–1pm','Quietest'],['2–3pm','Quiet'],['6–7pm','Busy']];
@@ -2478,7 +2480,7 @@ function obBack(){const g=GYMS[gymPick];return `<div class="bk-bg" aria-hidden="
  <div class="btns"><button class="btn btn-green" onclick="state.returning=true;persist();planBack='back';joinWay='monthly';billMode='m';billAnnual=false;studentOn=false;tierPick=PAST.plan;planPick=PAST.plan;SU.pay='saved';SU.terms=false;goOb('tiers')">Rejoin ${esc(g.n)} ${ico('arrow-right')}</button>
  <button class="btn btn-outline-w" onclick="state.returning=true;persist();goOb('find')">${ico('map-pin')} Try a different gym</button></div></div>`}
 function obSignin(){return `<div class="obhead"><button class="iconbtn glass" aria-label="Back" onclick="goOb('welcome')">${ico('arrow-left')}</button></div>
- <form class="obbody" onsubmit="event.preventDefault();if(/former/i.test($('#si-email').value)){gymPick=0;goOb('back');return}state.returning=false;noGym=false;member=true;state.isNew=false;state.tier=/standard/i.test($('#si-email').value)?'Standard':'Ultimate';state.perkUse=state.perkUse||{sauna:2,massage:0,guest:1};homeGym='London Peckham Rye';if(!booked.size){const c=classesFor(2).find(x=>x.left)||classesFor(2)[0];booked.add(c.id)}state.visits=Math.max(state.visits,1);persist();homeGym='London Peckham Rye';enterApp('Good to see you, '+fname())">
+ <form class="obbody" onsubmit="event.preventDefault();if(/former/i.test($('#si-email').value)){gymPick=0;goOb('back');return}state.returning=false;noGym=false;member=true;state.isNew=false;state.tier=/ultimate/i.test($('#si-email').value)?'Ultimate':'Standard';state.perkUse=state.perkUse||{sauna:2,massage:0,guest:1};homeGym='London Peckham Rye';if(!booked.size){const c=classesFor(2).find(x=>x.left)||classesFor(2)[0];booked.add(c.id)}state.visits=Math.max(state.visits,1);persist();homeGym='London Peckham Rye';enterApp('Good to see you, '+fname())">
   <div class="eyebrow" style="color:var(--energy-blue)">Welcome back</div><h1 class="display d-title">Sign in.</h1>
   <p class="body">Pick up where you left off.</p>
   <div class="field"><label for="si-email">Email</label><input id="si-email" type="email" placeholder="you@example.com" autocomplete="off"></div>
@@ -2502,7 +2504,7 @@ function classesFor(d){const gi=gymIdx();return CLASSTIMES.filter((_,k)=>(k+d+gi
 function busyChart(){const b=busyFor(busyDay);return `<div class="bars" aria-hidden="true">${b.map((n,i)=>`<i class="${busyDay===1&&i===7?'now':n>80?'peak':''}" style="height:${n}%"></i>`).join('')}</div><div class="barlabels num" aria-hidden="true"><span>6am</span><span>1pm</span><span>8pm</span></div>
  <p class="meta" style="margin-top:8px">${busyDay===1?'Quiet right now. Busiest around 5 to 7pm.':busyDay>4?'Weekends peak late morning. Evenings are quiet.':'Busiest around 5 to 7pm. Mornings and early afternoons are quietest.'}</p>`}
 function classList(){return classesFor(classDay).map(x=>{const on=booked.has(x.id);return `<div class="cls"><time>${x.tm}</time><div class="ci"><b>${x.c[0]}</b><small>${x.c[1]} · ${x.c[2]} · ${x.left?x.left+' spaces':'Waitlist'}</small></div><button class="btn btn-tonal" aria-pressed="${on}" aria-label="${on?'Booked':'Book'} ${x.c[0]} at ${x.tm}" onclick="bookClass('${x.id}')">${on?ico('check')+' Booked':x.left?'Book':'Join waitlist'}</button></div>`}).join('')}
-function bookClass(id){if(!member)return gate('classes');booked.has(id)?booked.delete(id):booked.add(id);if($('#classlist'))$('#classlist').innerHTML=classList();if(!ob&&page==='classes')keep();toast(booked.has(id)?'Class booked. See you there':'Booking cancelled')}
+function bookClass(id){if(!member)return gate('classes');booked.has(id)?booked.delete(id):booked.add(id);if($('#classlist'))$('#classlist').innerHTML=classList();if(!ob&&page==='classes')keep();if(!ob&&page==='home'){const y=$('#app').scrollTop;render();$('#app').scrollTop=y}if($('#overlay .fcs'))firstClassSheet();toast(booked.has(id)?'Class booked. See you there':'Booking cancelled')}
 function setBusyDay(d){busyDay=d;const lv=$('#busylive');if(lv)lv.hidden=d!==1;$('#busychart').innerHTML=busyChart();document.querySelectorAll('#busydays button').forEach((b,k)=>b.setAttribute('aria-pressed',k===d))}
 function setClassDay(d){classDay=d;$('#classlist').innerHTML=classList();document.querySelectorAll('#classdays button').forEach((b,k)=>b.setAttribute('aria-pressed',k===d))}
 function tourScroll(el){const w=el.parentNode,i=Math.round(el.scrollLeft/el.clientWidth);w.querySelector('.count').textContent=(i+1)+' / '+SLIDES.length;w.querySelectorAll('.dots i').forEach((d,k)=>d.classList.toggle('on',k===i))}
@@ -2972,7 +2974,7 @@ function applyScenario(k){gymPick=0;homeGym=GYMS[0].n;
  if(k==='new'){member=true;state.isNew=true;state.tier='Standard';state.perkUse=null;state.perks=null;state.visits=0;state.target=2;state.goals={why:['Feel good'],level:'new',likes:['Strength']};persist();ob=null;renderOb();navigate('home')}
  else if(k==='guest'){explore(true)}
  else if(k==='invite'){SU.from='Alex';goOb('invite')}
- else if(k==='returning'||k==='former'||k==='standard'){goOb('signin');const e=$('#si-email'),pw=$('#si-pw');if(e)e.value=k==='former'?'alex.former@example.com':k==='standard'?'alex.standard@example.com':'alex.morgan@example.com';if(pw)pw.value='password1'}
+ else if(k==='returning'||k==='former'||k==='standard'){goOb('signin');const e=$('#si-email'),pw=$('#si-pw');if(e)e.value=k==='former'?'alex.former@example.com':k==='standard'?'alex.morgan@example.com':'alex.ultimate@example.com';if(pw)pw.value='password1'}
  else{goOb('welcome')}}
 function startScenario(k){try{localStorage.setItem('tgg-scn-pending',k)}catch(e){}location.reload()}
 if(SCN&&SCENARIOS[SCN])applyScenario(SCN);
