@@ -486,10 +486,10 @@ h1,h2,h3,p{margin:0}
 .obstick{position:sticky;top:0;height:0;z-index:6}
 .obstick .iconbtn{position:absolute;left:16px;top:56px}
 @media (max-width:600px),(hover:none) and (pointer:coarse){.obstick .iconbtn{top:calc(12px + env(safe-area-inset-top,0px))}}
-.ob.ob-back{background:var(--navy);color:#fff}
+.ob.ob-back{background:#0055F8;color:#fff}.ob.ob-back .bk-bg{display:none}
 .ob.ob-back .bk-bg{position:absolute;inset:0;min-height:844px;background-size:cover;background-position:center bottom;transform:rotate(180deg);pointer-events:none;z-index:0}
 .bk-img{position:absolute;inset:0 0 auto;width:100%;height:300px;object-fit:cover;object-position:center 40%}
-.ob.ob-back .bk-shade{position:absolute;inset:0 0 auto;height:302px;background:linear-gradient(180deg,#001042B3 0%,#00104226 40%,#001042 100%)}
+.ob.ob-back .bk-shade{position:absolute;inset:0 0 auto;height:302px;background:linear-gradient(180deg,#00104299 0%,#0055F826 40%,#0055F8 100%)}
 .ob.ob-back .obhead{position:absolute;left:0;right:0}
 .ob.ob-back .wbk{width:100%;box-sizing:border-box;position:relative;z-index:1;margin-top:200px;padding:0 24px calc(28px + env(safe-area-inset-bottom,0px));display:flex;flex-direction:column;gap:14px}
 .ob.ob-back .wbk p{font-size:16px;line-height:1.45;color:#CDDFFF}
@@ -2927,14 +2927,14 @@ function momentHTML(kind,d){const vis=state.visits,tg=state.target;
    cta:d.cta||['Bring a friend',"guestpass()"],alt:d.alt||['Maybe later','']}
  }[kind];
  const primary='btn-green';
- if(kind==='signup'&&!state.returning){const nm=(SU.first||'').trim(),g=esc(homeGym);
+ if(kind==='signup'){const rb=!!state.returning,nm=(SU.first||'').trim(),g=esc(homeGym),who=rb?esc(fname()):nm?esc(nm.replace(/^./,c=>c.toUpperCase())):'friend';
   return {th:'blue',html:`<div class="m-tex" aria-hidden="true" style="inset:0;background:#0055F8;animation:none"></div>
   <span class="yi-tick" aria-hidden="true" style="background-image:url(${IMG.flecklime})">${ico('check')}</span>
-  <h2 class="m-title m-sans" id="m-title">Hello, ${nm?esc(nm.replace(/^./,c=>c.toUpperCase())):'friend'}.</h2><p class="m-sub">Your membership is live. For every group, there’s The Gym Group.</p>
+  <h2 class="m-title m-sans" id="m-title">${rb?'Welcome back, '+who+'.':'Hello, '+who+'.'}</h2><p class="m-sub">${rb?'Your membership is live again. Good to have you back.':'Your membership is live. For every group, there’s The Gym Group.'}</p>
   <div class="yi-card" style="background-image:linear-gradient(180deg,#0055F800 30%,#00104259 100%),url(${IMG.momzig})"><span class="yi-pill">${esc(tier())} membership</span>
-   <div class="yi-bot"><b>${g}</b><div class="yi-entry">${ico('qr-code')}Gym entry is ready. Just scan the pod</div></div></div>
-  <ul class="m-list"><li>${ico('calendar-days')}Classes are open to book</li><li>${ico('footprints')}A plan to help you find your feet</li></ul>
-  <div class="m-foot"><button class="btn ${primary}" id="m-cta" onclick="endMoment('openPers()')">Make it yours ${ico('arrow-right')}</button><button class="link" onclick="endMoment('')">Maybe later</button></div>`}}
+   <div class="yi-bot"><b>${g}</b>${rb?`<span>${PAST.visits} visits still on the board</span>`:''}<div class="yi-entry">${ico('qr-code')}Gym entry is ready. Just scan the pod</div></div></div>
+  <ul class="m-list"><li>${ico('calendar-days')}Classes are open to book</li><li>${ico('footprints')}${rb?'Your goals and favourites, right where you left them':'A plan to help you find your feet'}</li></ul>
+  <div class="m-foot"><button class="btn ${primary}" id="m-cta" onclick="endMoment('${rb?'':'openPers()'}')">${rb?'Let’s go':'Make it yours'} ${ico('arrow-right')}</button><button class="link" onclick="endMoment('${rb?'openPers()':''}')">${rb?'Update my goals':'Maybe later'}</button></div>`}}
  return {th:M.th,html:`${kind==='signup'?`<div class="m-tex m-bst${state.returning?' m-bst-b':''}">${burstLayer(state.returning?BURST_B:BURST)}</div>`:`<div class="m-tex${kind==='signup'?' m-burst':''}" aria-hidden="true" style="background-image:url(${IMG[kind==='signup'&&state.returning?'celburst':{workout:'txg8',goal:'txg9',signup:'celnavy',reward:'txp8'}[kind]]})"></div>`}<div class="m-shade${kind==='signup'?' m-cel':''}" aria-hidden="true"${kind==='signup'?' style="background:linear-gradient(180deg,#0010422E 0%,#00104200 40%)"':''}></div>
   <span class="m-tag">${M.tag}</span>
   ${kind==='signup'?'':`<div class="emblem" aria-hidden="true">${ico(M.icon)}</div>`}
