@@ -860,6 +860,7 @@ h1,h2,h3,p{margin:0}
 .guestcard p{color:var(--on-navy-2);font-size:14px;line-height:1.45}
 .guestcard .eyebrow{color:var(--electric-green)}
 .guestcard .btn{width:auto;align-self:flex-start}
+.wl-links{display:flex;flex-direction:column;align-items:center}.gym .gi b .glast{font-style:normal;font-size:11px;font-weight:700;color:var(--energy-blue);background:#0055F814;padding:2px 7px;border-radius:6px;margin-left:4px;vertical-align:2px;white-space:nowrap}
 .lockrow{display:flex;gap:10px;font-size:14px;color:var(--ink-3);align-items:center}
 .lockrow .ico{color:var(--energy-blue);font-size:18px}
 
@@ -1474,7 +1475,7 @@ function toast(t){const el=$('#toast');el.innerHTML=ico('check')+`<span>${esc(t)
 
 function appbar(){return `<header class="appbar">
   <button class="gympick" onclick="switchGym()" aria-label="${noLoc()?'No gym chosen yet. Choose a gym':(member?'Your gym':noGym?'Nearest gym':'Viewing')+': '+esc(homeGym)+'. '+(member?'Switch gym':'Choose a gym')}">
-    <span><small>${noLoc()?'No gym yet':member?'Your gym':noGym||nearPick?'Nearest to you':'Viewing'}</small><strong>${noLoc()?'Choose a gym':esc(homeGym)} ${ico('chevron-down')}</strong></span>
+    <span><small>${noLoc()?'No gym yet':member?'Your gym':state.inactive?'Your last gym':noGym||nearPick?'Nearest to you':'Viewing'}</small><strong>${noLoc()?'Choose a gym':esc(homeGym)} ${ico('chevron-down')}</strong></span>
   </button>
   <div class="actions">
     <button class="iconbtn" aria-label="${member?'Notifications, 1 new':'Notifications'}" onclick="notifications()">${ico('bell')}${member?'<span class="dot"></span>':''}</button>
@@ -1801,7 +1802,7 @@ ${noLoc()?locCard():''}
 ${member&&!sg?busycard():''}
  ${member&&!sg&&state.isNew&&!state.returning&&!state.goals&&!state.home?goalPrompt():''}
 ${member?budCard():''}${back?(state.lapsed?lapsedCard():'')+(newbie()?firstCard():'')+planJourneyCard()+(state.plan&&state.plan.plen?'':homeWeek()+(state.plan?planWeekCard():''))+wkPicked()+upNext(false):''}
- ${member&&!back&&!sg?planJourneyCard():''}${sg?startCard()+(!state.goals&&!state.home?goalPrompt():'')+busycard():member&&newbie()?(back?'':firstCard()):member&&!back?wkPicked():member?'':planner()}
+ ${member&&!back&&!sg?planJourneyCard():''}${sg?startCard()+(!state.goals&&!state.home?goalPrompt():'')+busycard():member&&newbie()?(back?'':firstCard()):member&&!back?wkPicked():member?'':state.inactive?lapsedBanner():planner()}
  ${member?'':busycard()}
  ${member&&brandNew()?firstClasses()+upNext(false):''}
  ${back?'':member&&!(state.plan&&state.plan.plen)?homeWeek():''}
@@ -1809,7 +1810,7 @@ ${back||(member&&!startGuide())?'':`<div class="sechead"><h2 class="h2">${state.
  <div class="rail">${pickedWorkouts().slice(0,4).map(card).join('')}</div>`}
  ${member&&!back&&!brandNew()?classesForYou():''}
  ${member?addonRail():friendhero()}
- ${member?'':guestBanner()}
+ ${member||state.inactive?'':guestBanner()}
  ${member?`<button class="link pz-edit" onclick="openPers()">${ico('sliders-horizontal')} Personalise your home</button>`:''}
  <p class="signoff">For every group, there’s <b>The Gym Group</b>.</p>`}
 
@@ -1822,7 +1823,14 @@ function workoutpage(){const list=filter==='Saved'?workouts.filter(w=>state.save
  ${list.length?`<div class="list">${list.map(card).join('')}</div>`:`<div class="empty">${ico('bookmark')}<h3 class="h3">Nothing saved yet</h3><p class="meta">Tap the bookmark on any workout. Your next visit will thank you.</p></div>`}
  ${buddycard('You don’t have to figure it out alone.','Turn on Gym Buddy for audio guidance during your workout.')}`}
 
-function guestProgress(){const days=Array.from({length:30},(_,i)=>i+1),ex=[3,5,10,12,17,19,24,26];
+function lapsedProgress(){const days=Array.from({length:31},(_,i)=>i+1),ex=[2,4,9,11,14];
+ return `<div class="greet"><div class="eyebrow">Your story so far</div><h1 class="display d-title">${PAST.visits} visits and counting.</h1><p class="body">Everything you did with us is saved. Rejoin and your next visit is number ${PAST.visits+1}.</p></div>
+ <section class="card exmonth" aria-labelledby="lpm"><div class="weekhead"><h2 class="h2" id="lpm">Your last month: ${PAST.ended}</h2><span class="badge" style="background:var(--tonal);color:var(--tonal-ink)">Inactive</span></div>
+  <div class="stats"><div class="stat"><b class="num">${PAST.visits}</b><p>Visits</p></div><div class="stat"><b class="num">${PAST.hours}<small> hrs</small></b><p>Time for yourself</p></div><div class="stat"><b class="num">${PAST.streak}</b><p>Week best streak</p></div></div>
+  <div class="cal" aria-hidden="true">${['M','T','W','T','F','S','S'].map(d=>`<span class="dow">${d}</span>`).join('')}${'<span></span>'.repeat(6)}${days.map(d=>`<span class="num ${ex.includes(d)?'v':''}">${d}</span>`).join('')}</div>
+  <p class="meta" style="margin-top:4px">Last visit ${PAST.last}. Favourite: ${PAST.fav}.</p></section>
+ ${lapsedBanner()}`}
+function guestProgress(){if(state.inactive)return lapsedProgress();const days=Array.from({length:30},(_,i)=>i+1),ex=[3,5,10,12,17,19,24,26];
  return `<div class="greet"><div class="eyebrow">Every visit counts</div><h1 class="display d-title">See your progress add up.</h1><p class="body">Join and every scan-in, workout and class lands here. Here’s how a first month could look.</p></div>
  <section class="card exmonth" aria-labelledby="exm"><div class="weekhead"><h2 class="h2" id="exm">A first month, for example</h2><span class="badge" style="background:var(--tonal);color:var(--tonal-ink)">Example</span></div>
   <div class="stats"><div class="stat"><b class="num">8</b><p>Visits</p></div><div class="stat"><b class="num">4<small> hrs</small></b><p>Time for yourself</p></div><div class="stat"><b class="num">4</b><p>Active weeks</p></div></div>
@@ -1917,7 +1925,23 @@ function upgradeUlt(){modal('Go Ultimate.','£5 more a month',`<p class="body">E
  <p class="fine">£${PLANS[2].p}/mo from your next payment on 4 December. No contract, switch back any time.</p>`,
  `<button class="btn btn-primary" onclick="state.tier='Ultimate';persist();closeModal();render();toast('You’re on Ultimate. Enjoy the extras')">${ico('check')} Switch to Ultimate</button>`)}
 
-function guestYou(){return `<div class="greet"><div class="eyebrow">All about you</div><h1 class="display d-title">Hey there.</h1><p class="body">You’re having a look around as a guest. Join or sign in to make the app yours.</p></div>
+function lapsedBanner(){return `<section class="guestcard gc-blue"><span class="eyebrow">Membership inactive</span><h2 class="display d-card">Ready to come back?</h2><p>Your ${PAST.visits} visits, favourites and goals are saved. Rejoin ${esc(homeGym)} with no joining fee to unlock gym entry and class booking again.</p><button class="btn btn-green btn-sm" style="min-height:48px" onclick="lapsedRejoin()">Rejoin ${esc(homeGym.replace('London ',''))} ${ico('arrow-right')}</button></section>`}
+function lapsedYou(){return `${youBack()}<div class="greet"><div class="eyebrow">All about you</div><h1 class="display d-title">Hey, ${esc(fname())}.</h1><p class="body">Your membership ended in ${PAST.ended}. Your details and history are saved for when you’re ready.</p></div>
+ <section class="membercard" style="${tierBg('Standard')};filter:saturate(.35)"><div class="top"><img src="${MARK_WHITE}" alt="The Gym Group"><span class="badge" style="background:#001042B3;color:#fff">Inactive</span></div>
+  <div><div class="h2">${esc(homeGym)}</div><p>Ended ${PAST.last} · ${PAST.visits} visits</p></div></section>
+ ${lapsedBanner()}
+ <div class="group">
+  <button class="row" onclick="navigate('progress')"><span class="rl"><span class="ri">${ico('chart-column')}</span>Your visit history</span><span class="rv">${PAST.visits} visits${ico('chevron-right')}</span></button>
+  <button class="row" onclick="openGoals()"><span class="rl"><span class="ri">${ico('target')}</span>Your fitness goals</span><span class="rv">Saved${ico('chevron-right')}</span></button>
+  <button class="row" onclick="toast('Personal details: name, email and phone')"><span class="rl"><span class="ri">${ico('user')}</span>Personal details</span><span class="rv">${ico('chevron-right')}</span></button>
+  <button class="row" onclick="toast('Payment details: card ending ${PAST.card}')"><span class="rl"><span class="ri">${ico('lock')}</span>Payment details</span><span class="rv">•••• ${PAST.card}${ico('chevron-right')}</span></button>
+ </div>
+ <div class="group">
+  <div class="row"><span class="rl"><span class="ri">${ico('sun-moon')}</span><span id="lbl-app">Appearance</span></span><div class="seg" role="radiogroup" aria-labelledby="lbl-app">${['Light','Dark'].map(o=>`<button role="radio" aria-checked="${(state.appearance==='Dark'?'Dark':'Light')===o}" onclick="setAppearance('${o}')">${o}</button>`).join('')}</div></div>
+  <button class="row" onclick="state.inactive=false;state.returning=false;persist();goOb('welcome')"><span class="rl"><span class="ri">${ico('log-in')}</span>Sign out</span><span class="rv">${ico('chevron-right')}</span></button>
+ </div>
+ <p class="signoff">For every group, there’s <b>The Gym Group</b>.</p>`}
+function guestYou(){if(state.inactive)return lapsedYou();return `<div class="greet"><div class="eyebrow">All about you</div><h1 class="display d-title">Hey there.</h1><p class="body">You’re having a look around as a guest. Join or sign in to make the app yours.</p></div>
  <section class="guestcard gc-blue mperks"><span class="eyebrow">Membership perks</span><h2 class="display d-card">More than a gym.</h2><p>Here’s what you get when you join. From £${PLANS[0].p} a month, no contract.</p>
   <ul class="mp-grid">${[['clock','24/7 access','Train whenever suits you'],['calendar-days','Classes included','Spin, yoga, HIIT and more'],['users','Guest passes','Bring a friend for free'],['headphones','Gym Buddy','Audio workouts, step by step'],['gift','Member offers','Money off kit and nutrition'],['flame','Ultimate extras','Saunas, massages, any gym']].map(([i,b,s])=>`<li><span>${ico(i)}</span><b>${b}</b><small>${s}</small></li>`).join('')}</ul>
   <button class="btn btn-green btn-sm" style="min-height:48px" onclick="${noGym?"goOb('find')":"planBack='find';goOb('plans')"}">${noGym?ico('map-pin')+' Find a gym to join':'See memberships '+ico('arrow-right')}</button>
@@ -2417,8 +2441,8 @@ let member=false,homeGym='London Peckham Rye';
 function obWelcome(){return `<img class="obimg" src="${IMG.friends}" alt="Three friends laughing together at the gym"><img class="oblogo" src="${LOGO_STACKED}" alt="The Gym Group">
  <div class="obcopy"><span class="tag">Welcome</span><h1 class="display d-splash wl-sans">Find your kind of gym.</h1>
  <p>Friendly gyms, flexible memberships and a plan to help you find your feet.</p>
- <div class="btns"><button class="btn btn-primary" onclick="state.returning=false;goOb('find')">${ico('map-pin')} Find a gym</button><button class="btn btn-outline-w" onclick="goOb('signin')">Sign in</button></div>
- <button class="link" onclick="state.returning=false;explore(true)">Just looking? Explore the app</button></div>`}
+ <div class="btns"><button class="btn btn-primary" onclick="state.returning=false;goOb('find')">${ico('map-pin')} Find a gym</button><button class="btn btn-outline-w" onclick="siMode='';goOb('signin')">Sign in</button></div>
+ <div class="wl-links"><button class="link" onclick="siMode='restart';goOb('signin')">Been a member? Restart your membership</button><button class="link" onclick="state.returning=false;explore(true)">Just looking? Explore the app</button></div></div>`}
 let gymSort=null;
 function gymPrice(g){return parseFloat(g.fp)}
 const PROMO={nojf:1,up:25,stu:25,stuT:[0,1],ends:'30 November'};
@@ -2437,7 +2461,7 @@ function gymMatches(){const q=gymQ.trim().toLowerCase(),s=sortBy();const l=GYMS.
 function setSort(s){if(s==='near'&&loc!=='on')return askLoc(()=>{gymSort='near';renderOb();setTimeout(()=>{mapTo(37,89,true);mapDrag()},50)},()=>{findRefresh()});gymSort=s;findRefresh()}
 function sortRow(){const s=sortBy();return [['az','A–Z'],['near','Nearest'],['price','Price']].map(([k,l])=>`<button class="chip" role="radio" aria-checked="${s===k}" onclick="setSort('${k}')">${k==='near'?ico('locate-fixed'):k==='price'?ico('tag'):''}${l}</button>`).join('')}
 function gymList(){const showD=loc==='on'||!!gymQ.trim(),l=gymMatches();
- return l.length?l.map(g=>`<button class="gym" role="radio" aria-checked="${g.i===findSel}" onclick="pickGym(${g.i})"><span class="gi"><b>${esc(g.n)}</b><small>${showD?`<span>${g.d}</span>`:''}<span class="gp">From £${g.fp||PLANS[0].p}/mo</span>${gymPromo(g)?'<span class="gnj">No joining fee</span>':''}</small></span><span class="gsel" aria-hidden="true"></span></button>`).join(''):`<div class="empty">${ico('search')}<h3 class="h3">No gyms match “${esc(gymQ)}”</h3><p class="meta">Try a town or postcode nearby.</p></div>`}
+ return l.length?l.map(g=>`<button class="gym" role="radio" aria-checked="${g.i===findSel}" onclick="pickGym(${g.i})"><span class="gi"><b>${esc(g.n)}${state.returning&&!member&&g.n===GYMS[0].n?' <em class="glast">Your last gym</em>':''}</b><small>${showD?`<span>${g.d}</span>`:''}<span class="gp">From £${g.fp||PLANS[0].p}/mo</span>${gymPromo(g)?'<span class="gnj">No joining fee</span>':''}</small></span><span class="gsel" aria-hidden="true"></span></button>`).join(''):`<div class="empty">${ico('search')}<h3 class="h3">No gyms match “${esc(gymQ)}”</h3><p class="meta">Try a town or postcode nearby.</p></div>`}
 function mapPins(){return GYMS.map((g,i)=>g.far?'':`<button class="pin" style="left:${g.x}%;top:${g.y}%" aria-pressed="${i===findSel}" aria-label="${esc(g.n)}, ${g.d}. Tap again for details" onclick="findSel===${i}?openGym(${i}):pickGym(${i})"><b><span>${i+1}</span></b>${g.edge?`<em>${ico('arrow-left')}${esc(g.n.replace('London ',''))}</em>`:''}</button>`).join('')}
 function mapMode(){if(gymQ.trim()){const m=gymMatches();return m.length&&m.every(g=>!g.far)?'street':'ukq'}return loc==='on'?'street':'uk'}
 function ukXY(g){return [(700+(g.lon+3.2)*0.5878*107.14)/14,(600-(g.lat-54.4)*107.14)/12]}
@@ -2460,7 +2484,7 @@ function findRefresh(){const m=$('#mapbox'),mode=mapMode();if(m&&(m.dataset.mode
  if(gymQ.trim()){const g=gymMatches()[0];if(g&&!g.far)setTimeout(()=>mapTo(g.x,g.y),0)}}
 let chGym=false;
 function obFind(){const mode=mapMode();return `<div class="obhead"><button class="iconbtn glass" aria-label="Back" onclick="if(chGym){chGym=false;goOb('tiers')}else if(member&&gymBack==='member'){exitGymView()}else goOb('welcome')">${ico('arrow-left')}</button></div>
- <div class="obbody"><div class="eyebrow" style="color:var(--energy-blue)">Gyms near you</div><h1 class="display d-title">Find a gym.</h1>
+ <div class="obbody"><div class="eyebrow" style="color:var(--energy-blue)">${state.returning&&!member?'Restart membership':'Gyms near you'}</div><h1 class="display d-title">${state.returning&&!member?'Choose your gym.':'Find a gym.'}</h1>
  <label class="search"><span class="sr" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">Search by town, postcode or gym name</span>${ico('search')}<input id="gymsearch" placeholder="Town, postcode or gym" value="${esc(gymQ)}" oninput="gymQ=this.value;findRefresh()" autocomplete="off"></label>
  <div class="seg fv-seg" role="tablist" aria-label="Show gyms as">${[['map','map','Map'],['list','list','List']].map(([k,i,l])=>`<button role="tab" id="fv-t-${k}" aria-controls="fv-map" aria-selected="${findView===k}" onclick="setFindView('${k}')">${ico(i)} ${l}</button>`).join('')}</div>
  <div id="fv-map" class="fv" ${findView==='map'?'':'hidden'}>
@@ -2470,28 +2494,28 @@ function obFind(){const mode=mapMode();return `<div class="obhead"><button class
  <div class="gyms" role="radiogroup" aria-label="Gyms" id="gymlist">${gymList()}</div></div>
  <div class="obfoot" id="fvgo" ${findSel==null?'hidden':''}>${fvFoot()}</div>`}
 function setFindView(v){findView=v;document.querySelectorAll('.fv-seg [role=tab]').forEach(b=>b.setAttribute('aria-selected',b.id==='fv-t-'+v));const el=$('#fv-map');if(el)el.hidden=v!=='map';if(v==='map'&&mapMode()==='street'&&findSel!=null)setTimeout(()=>mapTo(GYMS[findSel].x,GYMS[findSel].y,true),0)}
-function fvFoot(){if(findSel==null)return '';const n=GYMS[findSel].n.replace('London ','');if(member&&gymBack==='member')return `<button class="btn btn-primary" onclick="openGym(findSel)">${ico('eye')} Explore ${esc(n)}</button>${GYMS[findSel].n===homeGym?'':tier()==='Ultimate'?`<button class="btn btn-tonal" onclick="setGym(findSel);exitGymView()">Train here</button>`:`<button class="btn btn-tonal" onclick="gymMove(findSel)">Move my membership here</button>`}`;if(chGym)return `<button class="btn btn-primary" onclick="gymPick=findSel;chGym=false;goOb('tiers')">Choose ${esc(n)} ${ico('arrow-right')}</button>`;return `<button class="btn btn-primary" onclick="gymPick=findSel;planBack='find';goOb('plans')">Join ${esc(n)} ${ico('arrow-right')}</button><button class="btn btn-tonal" onclick="openGym(findSel)">${ico('eye')} Explore the gym first</button>`}
+function fvFoot(){if(findSel==null)return '';const n=GYMS[findSel].n.replace('London ','');if(member&&gymBack==='member')return `<button class="btn btn-primary" onclick="openGym(findSel)">${ico('eye')} Explore ${esc(n)}</button>${GYMS[findSel].n===homeGym?'':tier()==='Ultimate'?`<button class="btn btn-tonal" onclick="setGym(findSel);exitGymView()">Train here</button>`:`<button class="btn btn-tonal" onclick="gymMove(findSel)">Move my membership here</button>`}`;if(chGym)return `<button class="btn btn-primary" onclick="gymPick=findSel;chGym=false;goOb('tiers')">Choose ${esc(n)} ${ico('arrow-right')}</button>`;return `<button class="btn btn-primary" onclick="gymPick=findSel;planBack='find';goOb('plans')">${state.returning?'Rejoin':'Join'} ${esc(n)} ${ico('arrow-right')}</button><button class="btn btn-tonal" onclick="openGym(findSel)">${ico('eye')} Explore the gym first</button>`}
 function pickGym(i){findSel=i;gymPick=i;if(!GYMS[i].far&&$('#mapscroll'))mapTo(GYMS[i].x,GYMS[i].y);$('#gymlist').innerHTML=gymList();{const f=$('#fvgo');if(f){f.innerHTML=fvFoot();f.hidden=false}}document.querySelectorAll('.pin').forEach((p,k)=>p.setAttribute('aria-pressed',k===i));document.querySelectorAll('.upin').forEach(p=>p.setAttribute('aria-pressed',p.getAttribute('aria-label')===GYMS[i].n))}
 const PAST={plan:1,card:'4821',visits:38,hours:31,streak:6,fav:'Bodyweight burn',last:'14 March 2026',ended:'March'};
 function obBack(){const g=GYMS[gymPick];return `<div class="bk-bg" aria-hidden="true" style="background-image:url(${IMG.liftnavy})"></div>
  <div class="obhead"><button class="iconbtn glass" aria-label="Back" onclick="goOb('signin')">${ico('arrow-left')}</button></div>
  <div class="wbk"><span class="tag">Welcome back</span><h1 class="display d-title">Good to see you again, ${esc(fname())}.</h1>
- <p>Your membership at ${esc(g.n)} ended in ${PAST.ended}. Everything you did with us is right where you left it.</p>
+ <p>Your membership at ${esc(g.n)} ended in ${PAST.ended}. Everything you did with us is right where you left it. Rejoin now, or have a look around your account first.</p>
  <section class="bk-hist" aria-labelledby="bkh"><h2 id="bkh">Your story so far</h2>
   <div class="bk-stats"><div><b class="num">${PAST.visits}</b><span>Visits</span></div><div><b class="num">${PAST.hours}<small style="font-size:14px"> hrs</small></b><span>Time for yourself</span></div><div><b class="num">${PAST.streak}</b><span>Week best streak</span></div></div>
   <div class="bk-rows"><div>${ico('heart')} Favourite: ${PAST.fav}</div><div>${ico('map-pin')} Home gym: ${esc(g.n)}</div><div>${ico('calendar-days')} Last visit: ${PAST.last}</div></div></section>
  <div class="bk-offer">${ico('sparkles')}<div><b>No joining fee to come back</b><span>Same login, same history. Pick a plan and carry on from visit ${PAST.visits+1}.</span></div></div>
- <div class="btns"><button class="btn btn-green" onclick="state.returning=true;persist();planBack='back';joinWay='monthly';billMode='m';billAnnual=false;studentOn=false;tierPick=PAST.plan;planPick=PAST.plan;SU.pay='saved';SU.terms=false;goOb('tiers')">Rejoin ${esc(g.n)} ${ico('arrow-right')}</button>
- <button class="btn btn-outline-w" onclick="state.returning=true;persist();goOb('find')">${ico('map-pin')} Try a different gym</button></div></div>`}
+ <div class="btns"><button class="btn btn-green" onclick="rejoinPrep();planBack='back';goOb('tiers')">Rejoin ${esc(g.n)} ${ico('arrow-right')}</button>
+ <button class="btn btn-outline-w" onclick="rejoinPrep();goOb('find')">${ico('map-pin')} Try a different gym</button><button class="link" onclick="lapsedEnter()">Go to my account for now</button></div></div>`}
 function obSignin(){return `<div class="obhead"><button class="iconbtn glass" aria-label="Back" onclick="goOb('welcome')">${ico('arrow-left')}</button></div>
- <form class="obbody" onsubmit="event.preventDefault();if(/former/i.test($('#si-email').value)){gymPick=0;goOb('back');return}state.returning=false;noGym=false;member=true;state.isNew=false;state.tier=/ultimate/i.test($('#si-email').value)?'Ultimate':'Standard';state.perkUse=state.perkUse||{sauna:2,massage:0,guest:1};homeGym='London Peckham Rye';if(!booked.size){const c=classesFor(2).find(x=>x.left)||classesFor(2)[0];booked.add(c.id)}state.visits=Math.max(state.visits,1);persist();homeGym='London Peckham Rye';enterApp('Good to see you, '+fname())">
-  <div class="eyebrow" style="color:var(--energy-blue)">Welcome back</div><h1 class="display d-title">Sign in.</h1>
-  <p class="body">Pick up where you left off.</p>
+ <form class="obbody" onsubmit="event.preventDefault();if(siMode==='restart'){rejoinPrep();gymPick=0;if(loc!=='on')loc='on';gymQ='';goOb('find');setTimeout(()=>pickGym(0),0);return}if(/former/i.test($('#si-email').value)){gymPick=0;goOb('back');return}state.returning=false;noGym=false;member=true;state.isNew=false;state.tier=/ultimate/i.test($('#si-email').value)?'Ultimate':'Standard';state.perkUse=state.perkUse||{sauna:2,massage:0,guest:1};homeGym='London Peckham Rye';if(!booked.size){const c=classesFor(2).find(x=>x.left)||classesFor(2)[0];booked.add(c.id)}state.visits=Math.max(state.visits,1);persist();homeGym='London Peckham Rye';enterApp('Good to see you, '+fname())">
+  <div class="eyebrow" style="color:var(--energy-blue)">${siMode==='restart'?'Restart membership':'Welcome back'}</div><h1 class="display d-title">${siMode==='restart'?'Sign in to restart.':'Sign in.'}</h1>
+  <p class="body">${siMode==='restart'?'Use your existing login. We’ll take you straight to choosing your gym and plan, with your history kept.':'Pick up where you left off.'}</p>
   <div class="field"><label for="si-email">Email</label><input id="si-email" type="email" placeholder="you@example.com" autocomplete="off"></div>
   <div class="field"><label for="si-pw">Password</label><div class="pw"><input id="si-pw" type="password" placeholder="Your password" autocomplete="off" style="padding-right:48px"><button type="button" aria-label="Show password" onclick="const i=$('#si-pw');i.type=i.type==='password'?'text':'password'">${ico('eye')}</button></div></div>
   <button type="button" class="link" style="align-self:flex-start;min-height:32px" onclick="toast('Check your inbox for a reset link')">Forgot your password?</button>
   <button type="submit" class="btn btn-primary" style="margin-top:6px">Sign in ${ico('arrow-right')}</button>
-  <button type="button" class="btn btn-tonal" onclick="gymPick=0;goOb('back')">${ico('rotate-ccw')} Restart membership</button>
+  ${siMode==='restart'?'':`<button type="button" class="btn btn-tonal" onclick="siMode='restart';goOb('signin')">${ico('rotate-ccw')} Restart membership</button>`}
   <button type="button" class="link" style="align-self:center;margin-top:auto;min-height:44px" onclick="goOb('find')">New to The Gym Group? Find a gym</button>
  </form>`}
 
@@ -2646,7 +2670,7 @@ function promoSheet(){const g=GYMS[gymPick]||GYMS[0];modal('No joining fee.','Of
 function gymFlag(g,k){if(/Peckham Rye/.test(g.n))return true;let h=0;for(const c of g.n+k)h=(h*31+c.charCodeAt(0))>>>0;return k==='hx'?h%3===0:h%4===0}
 function obTiers(){applyGymPrices();if(tierPick===0&&!PLANS[0].p){tierPick=1;planPick=1}if(billAnnual&&!PLANS[tierPick].a){if(PLANS[2].a||PLANS[1].a){tierPick=PLANS[1].a?1:2;planPick=tierPick}else{billMode='m';billAnnual=false}}const g=GYMS[gymPick],rj=rejoining();if(joinWay==='day'&&!gymHas('day'))joinWay='monthly';const md=joinWay==='day'?'d':billMode==='s'?'s':'m';
  const PT=[['m','Membership'],['s','Student'],['d','Day pass']].filter(([k])=>k==='m'||gymHas(k==='d'?'day':'student'));
- return `<div class="obhead"><button class="iconbtn glass" aria-label="Back" onclick="goOb(rejoining()?'back':planBack||'find')">${ico('arrow-left')}</button></div>
+ return `<div class="obhead"><button class="iconbtn glass" aria-label="Back" onclick="goOb(rejoining()&&planBack==='back'?'back':planBack||'find')">${ico('arrow-left')}</button></div>
  <div class="obbody" style="gap:16px">${steps(1)}<div class="greet" style="gap:6px"><div class="ebrow"><div class="eyebrow" style="color:var(--energy-blue)">${rj?'Rejoin '+esc(g.n):esc(g.n)}</div>${gymPromo(g)&&!rj&&md==='m'?`<button class="promo2" onclick="promoSheet()" aria-label="No joining fee offer. See details">${ico('tag')}No joining fee${ico('chevron-right')}</button>`:''}</div><h1 class="display d-title">${rj?'Pick up where you left off.':'Pick your plan.'}</h1><p class="body">${rj?'We’ve picked your last plan. Change it if you like. No joining fee.':md==='d'?'One visit to try the gym. Pay once, nothing to cancel.':billMode==='s'?'Pay once for the months you need. No joining fee, nothing to cancel.':'Compare what’s included. You’ll choose how to pay next.'}</p></div>
  ${rj?`<div class="rj-last">${ico('history')}<span>You were on <b>${PLANS[PAST.plan].n}</b> until ${PAST.ended}</span></div>`:''}
 ${PT.length>1?`<div class="billtog ptype${PT.length===3?' bt3':''}" role="radiogroup" aria-label="Plan type">${PT.map(([k,l])=>`<button role="radio" aria-checked="${md===k}" onclick="pType('${k}')">${l}</button>`).join('')}</div>`:''}
@@ -2723,7 +2747,11 @@ function classesForYou(){const g=state.goals;if(!g||!g.likes.length)return '';co
  if(!out.length)return '';return `<div class="sechead"><h2 class="h2">Classes for you</h2><button class="link" onclick="navigate('classes')">Timetable ${ico('arrow-right')}</button></div>
  <div class="foryou">${out.map(x=>ctlRow(x).replace('<div class="ct"><b>'+x.tm+'</b>','<div class="ct"><b>'+x.tm+'</b><span>'+dayLabel(x.d)+'</span>').replace('<span>'+x.c[1]+'</span></div>','</div>')).join('')}</div>`}
 const SU={mate:'',first:'',last:'',email:'',mobile:'',dob:'',pw:'',mkt:false,pay:'card',card:'',exp:'',cvc:'',cname:'',post:'',terms:false};
-function rejoining(){return state.returning&&planBack==='back'&&!member}
+function rejoining(){return !!state.returning&&!member}
+function rejoinPrep(){state.returning=true;joinWay='monthly';billMode='m';billAnnual=false;studentOn=false;tierPick=PAST.plan;planPick=PAST.plan;SU.pay='saved';SU.terms=false;persist()}
+function lapsedEnter(){rejoinPrep();state.inactive=true;persist();member=false;noGym=false;gymPick=0;homeGym=GYMS[0].n;enterApp('Your account is inactive. Rejoin whenever you’re ready')}
+function lapsedRejoin(){rejoinPrep();gymPick=GYMS.findIndex(g=>g.n===homeGym);if(gymPick<0)gymPick=0;planBack='back';goOb('tiers')}
+let siMode='';
 function steps(n){if(rejoining()){const k=n===1?1:2;return `<div class="sustep" aria-label="Step ${k} of 2"><div class="sbars" style="grid-template-columns:repeat(2,1fr)">${[1,2].map(i=>`<i class="${i<=k?'on':''}"></i>`).join('')}</div><small>Step ${k} of 2 · ${['Your plan','Confirm'][k-1]}</small></div>`}return `<div class="sustep" aria-label="Step ${n} of 3"><div class="sbars">${[1,2,3].map(i=>`<i class="${i<=n?'on':''}"></i>`).join('')}</div><small>Step ${n} of 3 · ${['Membership','Your details','Payment'][n-1]}</small></div>`}
 function fld(id,label,type,ph,ac,extra=''){return `<div class="field" id="f-${id}"><label for="su-${id}">${label}</label><input id="su-${id}" type="${type}" placeholder="${ph}" autocomplete="${ac}" value="${esc(SU[id]||'')}" oninput="SU['${id}']=this.value;this.closest('.field').classList.remove('err')" ${extra}><span class="emsg" id="e-${id}"></span></div>`}
 function obDetails(){applyGymPrices();const g=GYMS[gymPick];return `<div class="obhead"><button class="iconbtn glass" aria-label="Back" onclick="goOb(joinWay==='day'?'plans':'tiers')">${ico('arrow-left')}</button></div>
@@ -2778,7 +2806,7 @@ function cardMask(el){const v=el.value.replace(/\D/g,'').slice(0,19);el.value=v.
 function expMask(el){let v=el.value.replace(/\D/g,'').slice(0,4);el.value=v.length>2?v.slice(0,2)+' / '+v.slice(2):v;SU.exp=el.value;el.closest('.field').classList.remove('err')}
 function payNext(){const btn=$('#onboard .obfoot button');btn.disabled=true;btn.innerHTML='Processing…';
  setTimeout(()=>{SU.card=SU.cvc='';joinNow()},1100)}
-function joinNow(){if(SCH.saved&&SCH.path&&SCH.days.length){state.plan={path:SCH.path,days:[...SCH.days],slot:SCH.slot,event:SCH.event,weeks:SCH.weeks}}else if(!state.plan){delete state.plan}if(joinWay==='buddy'&&!SU.from){state.buddyInv={name:budName(),email:SU.mate||'',status:'pending',back:(PLANS[planPick].p/2).toFixed(2)}}else{delete state.buddyInv}if(SU.from)state.buddyWith=SU.from;if(SU.first&&SU.first.trim()){const c=x=>x.trim().replace(/^./,m=>m.toUpperCase());state.name={first:c(SU.first),last:SU.last?c(SU.last):''}}member=true;noGym=false;state.tier=planPick===2?'Ultimate':planPick===0?'Off-peak':planPick===3?'Student':'Standard';if(state.tier!=='Ultimate'){state.perks=null;state.perkUse=null}if(SCH.saved&&SCH.days.length)state.target=Math.min(6,SCH.days.length);state.visits=0;state.isNew=true;if(!state.returning)delete state.goals;persist();homeGym=GYMS[gymPick].n;closeModal();enterApp();celebrate('signup')}
+function joinNow(){state.inactive=false;if(SCH.saved&&SCH.path&&SCH.days.length){state.plan={path:SCH.path,days:[...SCH.days],slot:SCH.slot,event:SCH.event,weeks:SCH.weeks}}else if(!state.plan){delete state.plan}if(joinWay==='buddy'&&!SU.from){state.buddyInv={name:budName(),email:SU.mate||'',status:'pending',back:(PLANS[planPick].p/2).toFixed(2)}}else{delete state.buddyInv}if(SU.from)state.buddyWith=SU.from;if(SU.first&&SU.first.trim()){const c=x=>x.trim().replace(/^./,m=>m.toUpperCase());state.name={first:c(SU.first),last:SU.last?c(SU.last):''}}member=true;noGym=false;state.tier=planPick===2?'Ultimate':planPick===0?'Off-peak':planPick===3?'Student':'Standard';if(state.tier!=='Ultimate'){state.perks=null;state.perkUse=null}if(SCH.saved&&SCH.days.length)state.target=Math.min(6,SCH.days.length);state.visits=0;state.isNew=true;if(!state.returning)delete state.goals;persist();homeGym=GYMS[gymPick].n;closeModal();enterApp();celebrate('signup')}
 let noGym=false;
 function explore(fresh){member=false;noGym=!!fresh;nearPick=false;if(fresh)gymPick=0;homeGym=GYMS[gymPick].n;enterApp(fresh?'Have a look around. Join whenever you’re ready':'Showing '+homeGym.replace('London ','')+'. Classes and busy times updated')}
 function gate(kind){const w={entry:['Gym entry comes with a membership.','Join to scan in at the pod and walk straight in, any time.'],classes:['Booking classes comes with a membership.','Join to book your place in any class at your gym.'],guest:['Guest passes come with a membership.','Join to bring a friend for a workout together.']}[kind];
@@ -2786,7 +2814,7 @@ function gate(kind){const w={entry:['Gym entry comes with a membership.','Join t
   <div class="card" style="display:flex;flex-direction:column;gap:12px"><div class="lockrow">${ico('scan-line')}Scan-in gym entry</div><div class="lockrow">${ico('calendar-days')}Class booking</div><div class="lockrow">${ico('users')}Guest passes</div></div>
   <p class="fine">Everything else, like workouts, Gym Buddy and busy times, is free to explore.</p>`,
  `<button class="btn btn-primary" onclick="closeModal();if(noGym){goOb('find')}else{planBack=ob||'find';goOb('plans')}">${noGym?'Find a gym':'See memberships'} ${ico('arrow-right')}</button><button class="btn btn-tonal" onclick="closeModal()">Keep exploring</button>`)}
-function guestBanner(){return `<section class="guestcard gc-blue"><span class="eyebrow">Exploring as a guest</span><h2 class="display d-card">Like what you see?</h2><p>${noLoc()?'Find a gym near you to unlock gym entry, class booking and guest passes.':'Join '+esc(homeGym)+' to unlock gym entry, class booking and guest passes.'}</p><button class="btn btn-green btn-sm" style="min-height:48px" onclick="${noLoc()?'goOb(\'find\')':'planBack=\'find\';goOb(\'plans\')'}">${noLoc()?ico('map-pin')+' Find a gym':'See memberships '+ico('arrow-right')}</button></section>`}
+function guestBanner(){if(state.inactive)return lapsedBanner();return `<section class="guestcard gc-blue"><span class="eyebrow">Exploring as a guest</span><h2 class="display d-card">Like what you see?</h2><p>${noLoc()?'Find a gym near you to unlock gym entry, class booking and guest passes.':'Join '+esc(homeGym)+' to unlock gym entry, class booking and guest passes.'}</p><button class="btn btn-green btn-sm" style="min-height:48px" onclick="${noLoc()?'goOb(\'find\')':'planBack=\'find\';goOb(\'plans\')'}">${noLoc()?ico('map-pin')+' Find a gym':'See memberships '+ico('arrow-right')}</button></section>`}
 
 /* ---------- classes tab ---------- */
 let cDay=1,cCat='All';
