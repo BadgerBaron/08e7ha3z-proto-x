@@ -1995,7 +1995,7 @@ function guestYou(){if(state.inactive)return lapsedYou();return `<div class="gre
  </div>
  <button class="link" style="align-self:flex-start;color:var(--ink-3);font-weight:500;font-size:13px;text-decoration:none" onclick="aboutApp()">App version 4.2.0</button>
  <p class="signoff">For every group, there’s <b>The Gym Group</b>.</p>`}
-function youBack(){const t=prevPage&&prevPage!=='you'?prevPage:'home',L={home:'Home',workouts:'Workouts',classes:'Classes',progress:'Progress',perks:'Perks'};return `<div class="ytop"><button class="iconbtn" aria-label="Back to ${L[t]||'Home'}" onclick="navigate('${t}')">${ico('arrow-left')}</button><span>${L[t]||'Home'}</span></div>`}
+function youBack(){const t=lastTab||'home',L={home:'Home',workouts:'Workouts',classes:'Classes',progress:'Progress',perks:'Perks'};return `<div class="ytop"><button class="iconbtn" aria-label="Back to ${L[t]||'Home'}" onclick="navigate('${t}')">${ico('arrow-left')}</button><span>${L[t]||'Home'}</span></div>`}
 function youpage(){if(!member)return guestYou();return `${youBack()}<div class="greet"><div class="eyebrow">All about you</div><h1 class="display d-title">Hey, ${esc(fname())}.</h1><p class="body">Your membership, your preferences, your way.</p></div>
  <section class="membercard" style="${tierBg(tier())}"><div class="top"><img src="${MARK_WHITE}" alt="The Gym Group"><span class="badge" style="background:#001042B3;color:#fff">${!member?'Guest · not a member yet':state.cancelled?'Ends 30 Nov':state.paused?'Paused':tier()}</span></div>
   <div><div class="h2">${esc(homeGym)}</div><p>Member since ${state.isNew?'November':'October'} 2026</p></div></section>
@@ -2028,7 +2028,7 @@ function render(){
   tabbar();
   if(page==='home'&&member&&state.plan&&state.plan.plen&&state.plan.missed&&!state.plan.missSeen&&!momentOn&&!ob&&$('#overlay').hidden){state.plan.missSeen=true;setTimeout(missedScreen,450)}
 }
-let prevPage='home';function navigate(p){if(p!==page)prevPage=page;page=p;try{history.replaceState(null,'','#'+p)}catch(e){}render();$('#app').scrollTo({top:0})}
+let prevPage='home',lastTab='home';function navigate(p){if(p!==page)prevPage=page;if(['home','workouts','classes','progress'].includes(p))lastTab=p;page=p;try{history.replaceState(null,'','#'+p)}catch(e){}render();$('#app').scrollTo({top:0})}
 window.addEventListener('hashchange',()=>{const h=location.hash.slice(1);if(PAGES.includes(h)&&h!==page){page=h;render()}});
 function setFilter(t){filter=t;const y=$('#app').scrollTop;render();$('#app').scrollTop=y}
 function save(id){const had=state.saved.includes(id);state.saved=had?state.saved.filter(x=>x!==id):[...state.saved,id];persist();const y=$('#app').scrollTop;render();$('#app').scrollTop=y;toast(had?'Removed from saved':'Saved for your next visit')}
