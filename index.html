@@ -67,9 +67,9 @@ h1,h2,h3,p{margin:0}
 .page{padding:4px 20px 184px;display:flex;flex-direction:column;gap:24px}
 
 @media (max-width:600px),(hover:none) and (pointer:coarse){
-  html,body{overflow:hidden}
+  html,body{overflow:hidden;background:var(--body);height:100%;min-height:100dvh;min-height:-webkit-fill-available}
   body{padding:0;display:block}
-  .device{position:fixed;inset:0;width:auto;height:auto;max-height:none;min-height:0;border:0;border-radius:0;box-shadow:none}
+  .device{position:fixed;inset:0;width:auto;height:auto;min-height:100%;max-height:none;border:0;border-radius:0;box-shadow:none}
   .statusbar{display:none}
   #app{inset:0;padding-top:env(safe-area-inset-top,0px)}
 }
