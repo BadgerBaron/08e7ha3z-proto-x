@@ -2476,7 +2476,7 @@ function gymMatches(){const q=gymQ.trim().toLowerCase(),s=sortBy();const l=GYMS.
 function setSort(s){if(s==='near'&&loc!=='on')return askLoc(()=>{gymSort='near';renderOb();setTimeout(()=>{mapTo(37,89,true);mapDrag()},50)},()=>{findRefresh()});gymSort=s;findRefresh()}
 function sortRow(){const s=sortBy();return [['az','A–Z'],['near','Nearest'],['price','Price']].map(([k,l])=>`<button class="chip" role="radio" aria-checked="${s===k}" onclick="setSort('${k}')">${k==='near'?ico('locate-fixed'):k==='price'?ico('tag'):''}${l}</button>`).join('')}
 function gymList(){const showD=loc==='on'||!!gymQ.trim(),l=gymMatches();
- return l.length?l.map(g=>`<button class="gym" role="radio" aria-checked="${g.i===findSel}" onclick="pickGym(${g.i})"><span class="gi"><b>${esc(g.n)}${state.returning&&!member&&g.n===GYMS[0].n?' <em class="glast">Your last gym</em>':''}</b><small>${showD?`<span>${g.d}</span>`:''}<span class="gp">From £${g.fp||PLANS[0].p}/mo</span>${gymPromo(g)?'<span class="gnj">No joining fee</span>':''}</small></span><span class="gsel" aria-hidden="true"></span></button>`).join(''):`<div class="empty">${ico('search')}<h3 class="h3">No gyms match “${esc(gymQ)}”</h3><p class="meta">Try a town or postcode nearby.</p></div>`}
+ return l.length?l.map(g=>`<button class="gym" role="radio" aria-checked="${g.i===findSel}" onclick="pickGym(${g.i})"><span class="gi"><b>${esc(g.n)}${state.returning&&!member&&g.n===GYMS[0].n?' <em class="glast">Your last gym</em>':''}</b><small>${showD?`<span>${g.d}</span>`:''}<span class="gp">From £${g.fp||PLANS[0].p}/mo</span>${gymPromo(g)&&!member?'<span class="gnj">No joining fee</span>':''}</small></span><span class="gsel" aria-hidden="true"></span></button>`).join(''):`<div class="empty">${ico('search')}<h3 class="h3">No gyms match “${esc(gymQ)}”</h3><p class="meta">Try a town or postcode nearby.</p></div>`}
 function mapPins(){return GYMS.map((g,i)=>g.far?'':`<button class="pin" style="left:${g.x}%;top:${g.y}%" aria-pressed="${i===findSel}" aria-label="${esc(g.n)}, ${g.d}. Tap again for details" onclick="findSel===${i}?openGym(${i}):pickGym(${i})"><b><span>${i+1}</span></b>${g.edge?`<em>${ico('arrow-left')}${esc(g.n.replace('London ',''))}</em>`:''}</button>`).join('')}
 function mapMode(){if(gymQ.trim()){const m=gymMatches();return m.length&&m.every(g=>!g.far)?'street':'ukq'}return loc==='on'?'street':'uk'}
 function ukXY(g){return [(700+(g.lon+3.2)*0.5878*107.14)/14,(600-(g.lat-54.4)*107.14)/12]}
@@ -2674,7 +2674,7 @@ function dayPanel(){return `<section class="stupanel" aria-label="Day pass"><div
  <ul>${PLANS[4].f.map(x=>`<li>${ico('check')}<span>${x}</span></li>`).join('')}</ul>
  <p class="meta">Like it? Switch to a membership any time from the app.</p></section>`}
 function offersStrip(md){const g=GYMS[gymPick]||GYMS[0],r=g.re,O=[];
- if(md==='m'){if(gymPromo(g))O.push(['gift',`No joining fee`,`Save £${baseFee(g)} on any monthly plan`]);
+ if(md==='m'){if(gymPromo(g)&&!member)O.push(['gift',`No joining fee`,`Save £${baseFee(g)} on any monthly plan`]);
   if(r.u1&&r.p[1]&&+r.u1<=+r.p[1])O.push(['zap',`Ultimate for £${r.u1} your first month`,'The price of Standard, then £'+r.p[2]+'/mo']);
   if(PROMO.up&&(r.u9||r.a[2]))O.push(['calendar-check',`${PROMO.up}% off 9 and 12 months`,'When you pay upfront']);}
  if(md==='s'&&PROMO.stu&&r.stu)O.push(['graduation-cap',`${PROMO.stu}% off 6 and 9 months`,'Student memberships, paid upfront']);
