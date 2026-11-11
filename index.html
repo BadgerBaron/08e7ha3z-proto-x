@@ -561,7 +561,7 @@ h1,h2,h3,p{margin:0}
 #ttd button{min-width:0;flex:1;padding:0 4px}#ttd,#tts{width:100%}#tts button{flex:1}
 .sortrow .chip[aria-checked="true"]{background:var(--chip-on);color:var(--chip-on-ink)}
 .gym .gi small{align-items:center}.gym .gi small .gp{color:var(--ink-2);font-weight:400}
-.gym .gi small .bpill{font-size:12px;font-weight:600;padding:2px 9px;border-radius:var(--r-pill);line-height:1.5}.bpill.q{background:var(--green-bg);color:var(--green-ink)}.bpill.b{background:#EA962829;color:var(--busy-ink)}
+.gym .gi small .bpill{font-size:12px;font-weight:600;padding:2px 9px;border-radius:var(--r-pill);line-height:1.5}.bpill.nj{display:inline-flex;align-items:center;gap:4px;background:var(--electric-green);color:var(--navy);font-weight:700}.bpill.nj svg{width:12px;height:12px}.bpill.q{background:var(--green-bg);color:var(--green-ink)}.bpill.b{background:#EA962829;color:var(--busy-ink)}
 .gprice{display:flex;align-items:baseline;gap:6px;font-size:14px;color:var(--ink-2);padding:0 2px 2px}.gprice b{font-size:22px;color:var(--ink);font-weight:700;letter-spacing:-.01em}.gprice em{margin-left:auto;font-style:normal;font-size:12px;font-weight:700;color:var(--green-ink);background:var(--green-bg);padding:4px 10px;border-radius:var(--r-pill);align-self:center}
 .si-rejoin{display:flex;gap:12px;align-items:flex-start;margin-top:8px;padding:14px 16px;border-radius:var(--r-tile);background:var(--surface);box-shadow:inset 0 0 0 1px var(--border)}
 .si-rejoin>.ico{font-size:20px;color:var(--energy-blue);margin-top:2px}.si-rejoin>div{display:flex;flex-direction:column;gap:2px;align-items:flex-start}.si-rejoin b{font-size:15px}.si-rejoin span{font-size:13px;color:var(--ink-2)}.si-rejoin .link{min-height:40px;display:inline-flex;align-items:center;gap:6px;padding:0}
@@ -2420,7 +2420,8 @@ let gymSort=null;
 function gymPrice(g){return parseFloat(g.fp)}
 const PROMO={nojf:1,up:25,stu:25,stuT:[0,1],ends:'30 November'};
 function promoP(v,pct){return String(Math.round(v*(1-pct/100)))}
-function joinFee(g){return PROMO.nojf?0:g.re?g.re.jf:15}
+function gymPromo(g){if(!PROMO.nojf||!g)return false;if(/Peckham Rye/.test(g.n))return true;let h=0;for(const c of g.n+'nj')h=(h*31+c.charCodeAt(0))>>>0;return h%3===0}
+function joinFee(g){return gymPromo(g)?0:g.re?g.re.jf:15}
 function baseFee(g){return g.re?g.re.jf:15}
 function applyGymPrices(){const g=GYMS[gymPick]||GYMS[0],r=g.re;[0,1,2].forEach(i=>{PLANS[i].p=r.p[i];PLANS[i].a=i?saverPrice(r,i,saverLen):null});PLANS[4].p=r.day;if(r.stu){STU_T.forEach((t,k)=>{t[3]=r.stu[k];t[1]=PROMO.stu&&PROMO.stuT.includes(k)?promoP(+r.stu[k],PROMO.stu):r.stu[k]})}}
 function gymHas(k){const r=(GYMS[gymPick]||GYMS[0]).re;return k==='student'?!!r.stu:k==='day'?!!r.day:k==='op'?!!r.p[0]:true}
@@ -2433,7 +2434,7 @@ function gymMatches(){const q=gymQ.trim().toLowerCase(),s=sortBy();const l=GYMS.
 function setSort(s){if(s==='near'&&loc!=='on')return askLoc(()=>{gymSort='near';renderOb();setTimeout(()=>{mapTo(37,89,true);mapDrag()},50)},()=>{findRefresh()});gymSort=s;findRefresh()}
 function sortRow(){const s=sortBy();return [['az','A–Z'],['near','Nearest'],['price','Price']].map(([k,l])=>`<button class="chip" role="radio" aria-checked="${s===k}" onclick="setSort('${k}')">${k==='near'?ico('locate-fixed'):k==='price'?ico('tag'):''}${l}</button>`).join('')}
 function gymList(){const showD=loc==='on'||!!gymQ.trim(),l=gymMatches();
- return l.length?l.map(g=>`<button class="gym" role="radio" aria-checked="${g.i===findSel}" onclick="pickGym(${g.i})"><span class="gi"><b>${esc(g.n)}</b><small>${showD?`<span>${g.d}</span>`:''}<span class="gp">From £${g.fp||PLANS[0].p}/mo</span><span class="bpill ${g.q?'q':'b'}">${g.b}</span></small></span><span class="gsel" aria-hidden="true"></span></button>`).join(''):`<div class="empty">${ico('search')}<h3 class="h3">No gyms match “${esc(gymQ)}”</h3><p class="meta">Try a town or postcode nearby.</p></div>`}
+ return l.length?l.map(g=>`<button class="gym" role="radio" aria-checked="${g.i===findSel}" onclick="pickGym(${g.i})"><span class="gi"><b>${esc(g.n)}</b><small>${showD?`<span>${g.d}</span>`:''}<span class="gp">From £${g.fp||PLANS[0].p}/mo</span>${gymPromo(g)?`<span class="bpill nj">${ico('tag')}No joining fee</span>`:''}</small></span><span class="gsel" aria-hidden="true"></span></button>`).join(''):`<div class="empty">${ico('search')}<h3 class="h3">No gyms match “${esc(gymQ)}”</h3><p class="meta">Try a town or postcode nearby.</p></div>`}
 function mapPins(){return GYMS.map((g,i)=>g.far?'':`<button class="pin" style="left:${g.x}%;top:${g.y}%" aria-pressed="${i===findSel}" aria-label="${esc(g.n)}, ${g.d}. Tap again for details" onclick="findSel===${i}?openGym(${i}):pickGym(${i})"><b><span>${i+1}</span></b>${g.edge?`<em>${ico('arrow-left')}${esc(g.n.replace('London ',''))}</em>`:''}</button>`).join('')}
 function mapMode(){if(gymQ.trim()){const m=gymMatches();return m.length&&m.every(g=>!g.far)?'street':'ukq'}return loc==='on'?'street':'uk'}
 function ukXY(g){return [(700+(g.lon+3.2)*0.5878*107.14)/14,(600-(g.lat-54.4)*107.14)/12]}
@@ -2630,7 +2631,7 @@ function dayPanel(){return `<section class="stupanel" aria-label="Day pass"><div
  <ul>${PLANS[4].f.map(x=>`<li>${ico('check')}<span>${x}</span></li>`).join('')}</ul>
  <p class="meta">Like it? Switch to a membership any time from the app.</p></section>`}
 function offersStrip(md){const g=GYMS[gymPick]||GYMS[0],r=g.re,O=[];
- if(md==='m'){if(PROMO.nojf)O.push(['gift',`No joining fee`,`Save £${baseFee(g)} on any monthly plan`]);
+ if(md==='m'){if(gymPromo(g))O.push(['gift',`No joining fee`,`Save £${baseFee(g)} on any monthly plan`]);
   if(r.u1&&r.p[1]&&+r.u1<=+r.p[1])O.push(['zap',`Ultimate for £${r.u1} your first month`,'The price of Standard, then £'+r.p[2]+'/mo']);
   if(PROMO.up&&(r.u9||r.a[2]))O.push(['calendar-check',`${PROMO.up}% off 9 and 12 months`,'When you pay upfront']);}
  if(md==='s'&&PROMO.stu&&r.stu)O.push(['graduation-cap',`${PROMO.stu}% off 6 and 9 months`,'Student memberships, paid upfront']);
@@ -2642,7 +2643,7 @@ function gymFlag(g,k){if(/Peckham Rye/.test(g.n))return true;let h=0;for(const c
 function obTiers(){applyGymPrices();if(tierPick===0&&!PLANS[0].p){tierPick=1;planPick=1}if(billAnnual&&!PLANS[tierPick].a){if(PLANS[2].a||PLANS[1].a){tierPick=PLANS[1].a?1:2;planPick=tierPick}else{billMode='m';billAnnual=false}}const g=GYMS[gymPick],rj=rejoining();if(joinWay==='day'&&!gymHas('day'))joinWay='monthly';const md=joinWay==='day'?'d':billMode==='s'?'s':'m';
  const PT=[['m','Membership'],['s','Student'],['d','Day pass']].filter(([k])=>k==='m'||gymHas(k==='d'?'day':'student'));
  return `<div class="obhead"><button class="iconbtn glass" aria-label="Back" onclick="goOb(rejoining()?'back':planBack||'find')">${ico('arrow-left')}</button></div>
- <div class="obbody" style="gap:16px">${steps(1)}<div class="greet" style="gap:6px"><div class="ebrow"><div class="eyebrow" style="color:var(--energy-blue)">${rj?'Rejoin '+esc(g.n):esc(g.n)}</div>${PROMO.nojf&&!rj&&md==='m'?`<button class="promo2" onclick="promoSheet()" aria-label="No joining fee offer. See details">${ico('tag')}No joining fee${ico('chevron-right')}</button>`:''}</div><h1 class="display d-title">${rj?'Pick up where you left off.':'Pick your plan.'}</h1><p class="body">${rj?'We’ve picked your last plan. Change it if you like. No joining fee.':md==='d'?'One visit to try the gym. Pay once, nothing to cancel.':billMode==='s'?'Pay once for the months you need. No joining fee, nothing to cancel.':'Compare what’s included. You’ll choose how to pay next.'}</p></div>
+ <div class="obbody" style="gap:16px">${steps(1)}<div class="greet" style="gap:6px"><div class="ebrow"><div class="eyebrow" style="color:var(--energy-blue)">${rj?'Rejoin '+esc(g.n):esc(g.n)}</div>${gymPromo(g)&&!rj&&md==='m'?`<button class="promo2" onclick="promoSheet()" aria-label="No joining fee offer. See details">${ico('tag')}No joining fee${ico('chevron-right')}</button>`:''}</div><h1 class="display d-title">${rj?'Pick up where you left off.':'Pick your plan.'}</h1><p class="body">${rj?'We’ve picked your last plan. Change it if you like. No joining fee.':md==='d'?'One visit to try the gym. Pay once, nothing to cancel.':billMode==='s'?'Pay once for the months you need. No joining fee, nothing to cancel.':'Compare what’s included. You’ll choose how to pay next.'}</p></div>
  ${rj?`<div class="rj-last">${ico('history')}<span>You were on <b>${PLANS[PAST.plan].n}</b> until ${PAST.ended}</span></div>`:''}
 ${PT.length>1?`<div class="billtog ptype${PT.length===3?' bt3':''}" role="radiogroup" aria-label="Plan type">${PT.map(([k,l])=>`<button role="radio" aria-checked="${md===k}" onclick="pType('${k}')">${l}</button>`).join('')}</div>`:''}
 ${md==='d'?dayPanel():billMode==='s'?stuPanel():planCards()}
