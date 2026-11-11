@@ -2442,7 +2442,7 @@ function obWelcome(){return `<img class="obimg" src="${IMG.friends}" alt="Three 
  <div class="obcopy"><span class="tag">Welcome</span><h1 class="display d-splash wl-sans">Find your kind of gym.</h1>
  <p>Friendly gyms, flexible memberships and a plan to help you find your feet.</p>
  <div class="btns"><button class="btn btn-primary" onclick="state.returning=false;goOb('find')">${ico('map-pin')} Find a gym</button><button class="btn btn-outline-w" onclick="siMode='';goOb('signin')">Sign in</button></div>
- <div class="wl-links"><button class="link" onclick="siMode='restart';goOb('signin')">Been a member? Restart your membership</button><button class="link" onclick="state.returning=false;explore(true)">Just looking? Explore the app</button></div></div>`}
+ <button class="link" onclick="state.returning=false;explore(true)">Just looking? Explore the app</button></div>`}
 let gymSort=null;
 function gymPrice(g){return parseFloat(g.fp)}
 const PROMO={nojf:1,up:25,stu:25,stuT:[0,1],ends:'30 November'};
