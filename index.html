@@ -770,12 +770,12 @@ h1,h2,h3,p{margin:0}
 .device.dark .ctl .low{color:#9DBFFF}.device.dark .cat-mind{background:#2A1F5C;color:#D2C4FF}
 .ctl.on{border-color:var(--success);box-shadow:inset 0 0 0 1px var(--success)}
 .brail{display:flex;gap:10px;overflow-x:auto;margin:0 -20px;padding:2px 20px;scrollbar-width:none}.brail::-webkit-scrollbar{display:none}
-.bk{flex-shrink:0;width:200px;border-radius:20px;background:var(--navy);color:#fff;padding:16px;display:flex;flex-direction:column;gap:4px;position:relative;overflow:hidden}
-.bk::after{content:"";position:absolute;right:-30px;top:-30px;width:90px;height:90px;border-radius:50%;border:18px solid #B2FF0026}
-.bk .when{font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--electric-green)}
-.bk b{font-family:var(--font-display);font-weight:800;font-size:26px;line-height:1;text-transform:uppercase}
-.bk small{font-size:13px;color:#C9D6F5}
-.bk button{align-self:flex-start;margin-top:8px;font-size:13px;font-weight:700;color:#fff;text-decoration:underline;text-underline-offset:3px}
+.brail{scroll-snap-type:x mandatory}.bk{flex:0 0 84%;scroll-snap-align:start;scroll-margin-left:20px;box-sizing:border-box;border-radius:20px;background:var(--navy);color:#fff;padding:18px 18px 18px 20px;display:flex;align-items:center;gap:16px;position:relative;overflow:hidden}.brail.one .bk{flex-basis:100%}.bk-t{display:flex;flex-direction:column;gap:2px;padding-right:16px;border-right:1px solid #FFFFFF26}.bk-t span{font-size:12px;font-weight:700;color:var(--electric-green)}.bk-t b{font-family:var(--font-display);font-size:30px;line-height:1}.bk-c{flex:1;min-width:0}.bk-c b{display:block;font-size:17px;line-height:1.2}
+
+.bk .when-old{font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--electric-green)}
+
+.bk small{display:block;font-size:13px;color:#C9D6F5;margin-top:2px}
+.bk>button{flex:none;align-self:center;min-height:44px;padding:0 4px;font-size:13px;font-weight:700;color:#fff;text-decoration:underline;text-underline-offset:3px}
 .tthead{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin-bottom:-6px}
 .cls{display:flex;align-items:center;gap:14px;padding:12px 0}
 .cls+.cls{border-top:1px solid var(--border)}
@@ -2910,7 +2910,7 @@ function upNext(withW){const bk=[];for(let d=0;d<7;d++)classesFor(d).forEach(x=>
  <div class="foryou">${bk.slice(0,2).map(x=>ctlRow(x).replace('<div class="ct"><b>'+x.tm+'</b>','<div class="ct"><b>'+x.tm+'</b><span>'+dayLabel(x.d)+'</span>').replace('<span>'+x.c[1]+'</span></div>','</div>')).join('')}</div>`:''}
  ${pickedForYou(withW!==false)}`}
 function myBookings(){const all=[];for(let d=0;d<7;d++)classesFor(d).forEach(x=>{if(booked.has(x.id))all.push({...x,d})});
- return all.length?`<div class="sechead"><h2 class="h2">Your bookings</h2><span class="meta">${all.length} coming up</span></div><div class="brail">${all.map(x=>`<div class="bk"><span class="when">${dayLabel(x.d)} · ${x.tm}</span><b>${x.c[0]}</b><small>${x.c[1]} · ${x.c[2]}</small><button onclick="bookClass('${x.id}')">Cancel booking</button></div>`).join('')}</div>`:''}
+ return all.length?`<div class="sechead"><h2 class="h2">Your bookings</h2><span class="meta">${all.length} coming up</span></div><div class="brail${all.length===1?' one':''}">${all.map(x=>`<div class="bk"><div class="bk-t"><span>${dayLabel(x.d)}</span><b class="num">${x.tm}</b></div><div class="bk-c"><b>${x.c[0]}</b><small>${x.c[2]} · ${x.c[1]}</small></div><button aria-label="Cancel ${x.c[0]} booking" onclick="bookClass('${x.id}')">Cancel</button></div>`).join('')}</div>`:''}
 const CLASSINFO={'Fresh start':'Your first class. The coach shows you every move.','Total body':'A bit of everything: cardio, strength and a stretch.','Spin':'Ride to the music. You set the resistance.','Bodyweight burn':'No kit, just you. Scale every move up or down.','Core and stretch':'Slow, steady and good for your back.','Kettlebell basics':'Learn the swing, squat and press, step by step.','HIIT':'Short bursts, short rests. Go at your own pace.','Yoga flow':'Move, breathe, reset. Mats provided.','Glutes and legs':'Lower-body strength with dumbbells and bands.'};
 const EASYCL=['Fresh start','Total body','Core and stretch','Yoga flow','Bodyweight burn'];
 function classesPreview(){const order=[...CLASSPOOL].sort((a,b)=>(EASYCL.includes(b[0])?1:0)-(EASYCL.includes(a[0])?1:0)||EASYCL.indexOf(a[0])-EASYCL.indexOf(b[0]));
