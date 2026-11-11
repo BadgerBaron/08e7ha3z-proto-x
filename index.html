@@ -1815,7 +1815,7 @@ ${member?budCard():''}${back?(state.lapsed?lapsedCard():'')+(newbie()?firstCard(
  ${back?'':member&&!(state.plan&&state.plan.plen)?homeWeek():''}
 ${back||(member&&!startGuide())?'':`<div class="sechead"><h2 class="h2">${state.goals?'Picked for your goals':'A little direction?'}</h2><button class="link" onclick="navigate('workouts')">All workouts ${ico('arrow-right')}</button></div>
  <div class="rail">${pickedWorkouts().slice(0,4).map(card).join('')}</div>`}
- ${member&&!back&&!brandNew()?classesForYou():''}
+ ${member&&!back&&!brandNew()?classesForYou():''}${member?'':guestClasses()}
  ${member?addonRail():friendhero()}
  ${member||state.inactive?'':guestBanner()}
  ${member?`<button class="link pz-edit" onclick="openPers()">${ico('sliders-horizontal')} Personalise your home</button>`:''}
@@ -2765,6 +2765,10 @@ function pickedWorkouts(){return [...workouts].sort((a,b)=>goalScore(b)-goalScor
 function heroPick(){const g=state.goals;if(!g||!g.level)return base[0];return base[LEVELS.find(l=>l[0]===g.level)[3]]}
 function tunedBar(){const g=state.goals;if(!g)return member?`<div class="tuned"><button class="link" onclick="openGoals()">${ico('sparkles')} Set your goals to personalise this</button></div>`:'';
  const tags=[`${state.target} visit${state.target>1?'s':''} a week`,...g.why.slice(0,2)];return `<div class="tuned" aria-label="Tuned to your goals">${tags.map(x=>`<span class="tg">${x}</span>`).join('')}<button class="link" onclick="openGoals()">Edit</button></div>`}
+function guestClasses(){const out=[];for(let d=1;d<7&&out.length<3;d++)classesFor(d).forEach(x=>{if(out.length<3&&x.left&&!out.some(o=>o.c[0]===x.c[0]))out.push({...x,d})});
+ return `<div class="sechead"><h2 class="h2">Classes to try</h2><button class="link" onclick="navigate('classes')">Timetable ${ico('arrow-right')}</button></div>
+ ${noGym?`<p class="meta" style="margin:-4px 0 4px">An example week. Pick a gym to see its real timetable.</p>`:''}
+ <div class="foryou">${out.map(x=>ctlRow(x).replace('<div class="ct"><b>'+x.tm+'</b>','<div class="ct"><b>'+x.tm+'</b><span>'+dayLabel(x.d)+'</span>').replace('<span>'+x.c[1]+'</span></div>','</div>')).join('')}</div>`}
 function classesForYou(){const g=state.goals;if(!g||!g.likes.length)return '';const out=[];for(let d=1;d<7&&out.length<2;d++)classesFor(d).forEach(x=>{if(out.length<2&&g.likes.includes(CATS[x.c[0]])&&x.left)out.push({...x,d})});
  if(!out.length)return '';return `<div class="sechead"><h2 class="h2">Classes for you</h2><button class="link" onclick="navigate('classes')">Timetable ${ico('arrow-right')}</button></div>
  <div class="foryou">${out.map(x=>ctlRow(x).replace('<div class="ct"><b>'+x.tm+'</b>','<div class="ct"><b>'+x.tm+'</b><span>'+dayLabel(x.d)+'</span>').replace('<span>'+x.c[1]+'</span></div>','</div>')).join('')}</div>`}
