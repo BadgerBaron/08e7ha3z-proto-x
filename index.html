@@ -1254,6 +1254,7 @@ button.sg-step{cursor:pointer}
 .planwk{position:relative;overflow:hidden;border-radius:var(--r-card);background:var(--energy-blue);color:#fff;padding:22px;display:flex;flex-direction:column;gap:12px}
 .planwk::before{content:"";position:absolute;width:250px;height:250px;border-radius:50%;background:#FFFFFF0B;border:40px solid #FFFFFF0C;right:-80px;top:-120px;pointer-events:none}
 .planwk>*{position:relative}
+.planwk .pw-sum{display:flex;flex-wrap:wrap;gap:6px}.planwk .pw-sum span{padding:6px 12px;border-radius:999px;background:#FFFFFF26;font-size:13px;font-weight:700}
 .planwk p{font-size:14px;line-height:1.45;color:#E6EFFF}
 .planwk .pw-days{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px}
 .planwk .pw-days button{height:40px;border-radius:var(--r-pill);background:#FFFFFF1F;color:#fff;font-size:13px;font-weight:700}
@@ -1557,9 +1558,14 @@ const PATHS={
  own:{icon:'dumbbell',t:'Just work out',s:'I’ve got my own plan',title:'Just work out.',lede:'You know what you’re doing. We’ll find you the quiet times and keep your week on track.',days:[0,2,4]},
  event:{icon:'medal',t:'Train for an event',s:'Race, Hyrox or a big day',title:'Train for your event.',lede:'Pick your event and how long you’ve got. We’ll build up week by week so you’re ready on the day.',days:[1,3,5,6]}};
 const EVW={run:[['Easy run',30],['Strength for runners',35],['Intervals',30],['Long run',50]],hyrox:[['Sled and row',40],['Strength',45],['Engine builder',35],['Functional circuit',40]]};
-function planner(){return `<section class="planwk" aria-labelledby="pwt"><span class="tag">Your gym plan</span><h2 class="display d-hero" id="pwt">Kick things off with a plan.</h2>
- <p>Tell us where you’re starting from and we’ll build your first four weeks around your life.</p>
- <div class="pw-paths">${Object.entries(PATHS).map(([k,v])=>`<button class="pw-path" onclick="openPlan('${k}')"><span class="pi">${ico(v.icon)}</span><span><b>${v.t}</b><small>${v.s}</small></span>${ico('chevron-right')}</button>`).join('')}</div></section>`}
+function planner(){const g=state.goals;if(g&&g.level){const lv=(LEVELS.find(l=>l[0]===g.level)||[])[1]||'',n=state.plan&&state.plan.days?state.plan.days.length:state.target;return `<section class="planwk" aria-labelledby="pwt"><span class="tag">Your gym plan</span><h2 class="display d-hero" id="pwt">Your plan is ready.</h2>
+ <div class="pw-sum">${[{new:'New to the gym',back:'Getting back into it',pro:'Already go regularly'}[g.level],...(g.why||[]).slice(0,2),n+' visit'+(n===1?'':'s')+' a week'].map(t=>`<span>${esc(t)}</span>`).join('')}</div><p>Join a gym and your plan is waiting for you on day one.</p>
+ <button class="btn btn-green" style="width:100%" onclick="${noGym?"goOb('find')":"planBack='find';goOb('plans')"}">${noGym?ico('map-pin')+' Find a gym to start':'See memberships '+ico('arrow-right')}</button>
+ <button class="link" style="color:#fff;align-self:center;min-height:44px" onclick="openPers()">Change my answers</button></section>`}
+ return `<section class="planwk" aria-labelledby="pwt"><span class="tag">Your gym plan</span><h2 class="display d-hero" id="pwt">Kick things off with a plan.</h2>
+ <p>How do you feel on the gym floor? Tell us and we’ll shape your first few weeks around you.</p>
+ <div class="pw-paths">${LEVELS.map(([k,l,sb],i)=>`<button class="pw-path" onclick="planStart('${k}')"><span class="pi">${ico(Object.values(PATHS)[i].icon)}</span><span><b>${l}</b><small>${sb}</small></span>${ico('chevron-right')}</button>`).join('')}</div></section>`}
+function planStart(k){openPers();PZ.level=k;PZ.i=1;keepOb()}
 function planRows(){const DN=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'],sl=SLOTS[SCH.slot],P=SCH.path;
  const pick=j=>{if(P==='new'){const w=pickedWorkouts().filter(w=>w.level==='Beginner'||w.level==='All levels');const x=w[j%w.length]||workouts[0];return [x.name,x.time+' min · Gym Buddy audio']}
   if(P==='own')return ['Your session','60 min · your plan, your way'];
