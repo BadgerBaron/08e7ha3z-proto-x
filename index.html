@@ -2610,8 +2610,7 @@ function obSignin(){const pw=siStep==='pw';return `<div class="obhead"><button c
   <button type="submit" class="btn btn-primary" style="margin-top:6px">Sign in ${ico('arrow-right')}</button>`:`<div class="field"><label for="si-email">Email</label><input id="si-email" type="email" placeholder="you@example.com" autocomplete="email" value="${esc(siEmail)}"></div>
   <button type="submit" class="btn btn-primary" style="margin-top:6px">Continue ${ico('arrow-right')}</button>
   <div class="si-or" aria-hidden="true"><span>or log in with</span></div>
-  <div class="si-sso"><button type="button" class="btn" onclick="siSocial('alex@gmail.com')">Google</button><button type="button" class="btn" onclick="siSocial('alex@facebook.com')">Facebook</button><button type="button" class="btn" onclick="siSocial('alex@icloud.com')">Apple</button></div>
-  ${siMode==='restart'?'':`<button type="button" class="btn btn-tonal" style="margin-top:6px" onclick="siMode='restart';goOb('signin')">${ico('rotate-ccw')} Restart membership</button>`}`}
+  <div class="si-sso"><button type="button" class="btn" onclick="siSocial('alex@gmail.com')">Google</button><button type="button" class="btn" onclick="siSocial('alex@facebook.com')">Facebook</button><button type="button" class="btn" onclick="siSocial('alex@icloud.com')">Apple</button></div>`}
   <p class="si-up">Don’t have an account? <button type="button" class="link" onclick="siStep='email';goOb('find')">Sign up</button></p>
  </form>`}
 
