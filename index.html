@@ -1357,7 +1357,7 @@ button.sg-step{cursor:pointer}
 
 
 /* signature moments: full screen */
-.moment{position:absolute;inset:0;z-index:80;display:flex;flex-direction:column;padding:72px 24px calc(32px + env(safe-area-inset-bottom,0px));overflow:hidden;opacity:0;transition:opacity 300ms var(--ease)}
+.moment{position:absolute;inset:0;z-index:80;display:flex;flex-direction:column;padding:60px 24px calc(14px + env(safe-area-inset-bottom,0px));overflow:hidden;opacity:0;transition:opacity 300ms var(--ease)}
 .moment.show{opacity:1}
 .wrap{position:absolute;inset:0;z-index:82;background:#001042;color:#fff;overflow:hidden;display:flex;flex-direction:column;opacity:0;transition:opacity .3s var(--ease);user-select:none;-webkit-user-select:none}
 .wrap.show{opacity:1}
@@ -1464,9 +1464,9 @@ button.sg-step{cursor:pointer}
 .m-badge .ico{font-size:28px;color:var(--electric-green)}
 .m-lime .m-badge .ico{color:var(--energy-blue)}
 .m-badge b{display:block;font-size:15px}.m-badge small{font-size:13px;opacity:.85}
-.m-foot{margin-top:auto;display:flex;flex-direction:column;gap:6px;animation:rise .55s var(--ease) both .66s}
+.m-foot{margin-top:auto;padding-top:32px;display:flex;flex-direction:column;gap:4px;animation:rise .55s var(--ease) both .66s}
 .btn-navy{background:#001042;color:#fff}
-.m-foot .link{color:inherit;align-self:center}
+.m-foot .link{color:inherit;align-self:center;min-height:48px}
 @keyframes fall{0%{transform:translate(0,0) rotate(0);opacity:1}70%{opacity:1}100%{transform:translate(var(--x),210px) rotate(var(--r));opacity:0}}
 @keyframes pop{0%{transform:scale(.2) rotate(-30deg);opacity:0}100%{transform:none;opacity:1}}
 @keyframes rise{0%{transform:translateY(18px);opacity:0}100%{transform:none;opacity:1}}
@@ -3319,7 +3319,7 @@ function momentHTML(kind,d){const vis=state.visits,tg=state.target;
  if(kind==='signup'){const rb=!!state.returning,nm=(SU.first||'').trim(),g=esc(homeGym),who=rb?esc(fname()):nm?esc(nm.replace(/^./,c=>c.toUpperCase())):'friend';
   return {th:'blue',html:`<div class="m-tex" aria-hidden="true" style="inset:0;background:#0055F8;animation:none"></div>
   <span class="yi-tick" aria-hidden="true" style="background-image:url(${IMG.flecklime})">${ico('check')}</span>
-  <h2 class="m-title m-sans" id="m-title">${rb?'Welcome back, '+who+'.':'Hello, '+who+'.'}</h2><p class="m-sub">${rb?'Your membership is live again. Good to have you back.':'Your membership is live. For every group, there’s The Gym Group.'}</p>
+  <h2 class="m-title m-sans" id="m-title">${rb?'Welcome back, '+who+'.':'Hello, '+who+'.'}</h2><p class="m-sub">${rb?'Your membership is now live again.':'Your membership is now live.'}</p>
   <div class="yi-card" style="background-image:linear-gradient(180deg,#0055F800 30%,#00104259 100%),url(${IMG.momzig})"><span class="yi-pill">${esc(tier())} membership</span>
    <div class="yi-bot"><b>${g}</b>${rb?`<span>${PAST.visits} visits still on the board</span>`:''}<div class="yi-entry">${ico('qr-code')}Gym entry is ready. Just scan the pod</div></div></div>
   <ul class="m-list"><li>${ico('calendar-days')}Classes are open to book</li><li>${ico('footprints')}${rb?'Your goals and favourites, right where you left them':'A plan to help you find your feet'}</li></ul>
