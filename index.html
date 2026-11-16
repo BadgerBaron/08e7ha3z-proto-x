@@ -1482,6 +1482,9 @@ button.sg-step{cursor:pointer}
 .toast.show{opacity:1;transform:translate(-50%,0)}
 
 @media (prefers-reduced-motion:reduce){*,*::before,*::after{transition-duration:0s!important;animation-duration:0s!important;scroll-behavior:auto!important}}
+.bennote{margin:8px 0 2px;padding:10px 12px;border-radius:12px;background:var(--tonal);color:var(--tonal-ink);font-size:13px;line-height:1.45}.bennote b{font-weight:700}
+.ohl{list-style:none;margin:10px 0 0;padding:0;display:flex;flex-direction:column;gap:14px}.ohl li{display:flex;gap:12px;align-items:flex-start}.ohl .ohi{width:36px;height:36px;border-radius:10px;background:var(--tonal);color:var(--energy-blue);display:grid;place-items:center;flex:none;font-size:18px}.ohl b{display:block;font-weight:700;font-size:15px;line-height:1.3;color:var(--ink)}.ohl span:not(.ohi){display:block;font-size:14px;line-height:1.45;color:var(--ink-2);margin-top:2px}
+.hero .sg-x{position:absolute;top:12px;right:12px;left:auto;bottom:auto;z-index:3;width:40px;height:40px;padding:0;background:#FFFFFF26;backdrop-filter:blur(6px);border-radius:50% !important;display:grid;place-items:center;color:#fff}
 </style>
 
 <div class="device" id="device">
@@ -1703,12 +1706,12 @@ function firstCard(){const k=state.kick&&state.kick.time?state.kick:null;return 
 function planPrompt(){return `<button class="planprompt" onclick="planFromPrompt()"><span class="gi">${ico('calendar-days')}</span><span><b>Want a plan?</b><small>We’ll build a few weeks around your goals. Takes a minute.</small></span>${ico('chevron-right')}</button>`}
 function planFromPrompt(){openPers();const st=pzSteps(),h=st.indexOf('help');PZ.guide='goal';if(!PZ.plenSet)PZ.plen=pzDefLen();PZ.i=h>=0?h:Math.max(0,st.indexOf('when'));keepOb()}
 function goalPrompt(){return `<section class="goalprompt" aria-labelledby="gpt"><span class="gi">${ico('target')}</span><div style="display:flex;flex-direction:column"><h2 id="gpt">Make this app yours</h2><p>Three or four quick questions and we’ll set up your home around you. Under a minute.</p><button class="btn btn-primary" onclick="openPers()">Make it yours ${ico('arrow-right')}</button></div></section>`}
-function startGuide(){return !!(member&&state.isNew&&!state.returning&&!state.visits&&(!state.goals||state.goals.level==='new'))}
+function startGuide(){return !!(member&&state.isNew&&!state.returning&&!state.visits&&!state.sgOff)}
 function startCard(){const k=state.kick&&state.kick.time?state.kick:null,S=[
  {d:!!(state.fvPlanned||k),t:'Plan your first visit',s:'When to come, how to get in and what to expect.',a:'openGuide()',c:'Plan your first visit'},
- {d:!!k,t:k?'Kickstart booked':'Book a Kickstart session',s:k?`${k.day}, ${k.time} with ${k.who}. Tap to change or cancel`:'Free 30 minutes with a trainer. Optional.',a:k?'kickManage()':"openGuide();GV='kick';drawGuide(true)",c:'Book a Kickstart'}].filter((x,i)=>i===0||(state.goals&&state.goals.level==='new')||k);
+ {d:!!k,t:k?'Kickstart booked':'Book a Kickstart session',s:k?`${k.day}, ${k.time} with ${k.who}. Tap to change or cancel`:'Free 30 minutes with a trainer. Optional.',a:k?'kickManage()':"openGuide();GV='kick';drawGuide(true)",c:'Book a Kickstart'}];
  const n=S.filter(x=>x.d).length,nx=S.findIndex(x=>!x.d),cta=S[nx]&&S[nx].a?S[nx]:null;
- return `<section class="hero navy fvcard sgcard" aria-labelledby="sg-h"><img src="${IMG.liftcard}" alt="" aria-hidden="true">
+ return `<section class="hero navy fvcard sgcard" aria-labelledby="sg-h"><img src="${IMG.liftcard}" alt="" aria-hidden="true"><button class="fc-x sg-x" aria-label="Dismiss" onclick="state.sgOff=true;persist();render();toast('Hidden from home')">${ico('x')}</button>
  <div class="copy"><span class="tag">Get started</span><h2 class="display d-hero sg-sans" id="sg-h">${k?'Day one. Sorted.':'Let’s make day one easy.'}</h2>
  <ol class="sg-steps" aria-label="${n} of ${S.length} done">${S.map((x,i)=>{const cls='sg-step'+(x.d?' done':'')+(i===nx?' next':''),inner=`<span class="n">${x.d?ico('check'):i+1}</span><span class="t"><b>${x.t}${x.d?'<span class="sr-only"> (done)</span>':''}</b><small>${x.s}</small></span>`;return `<li>${x.a?`<button class="${cls}" onclick="${x.a}">${inner}${ico('chevron-right')}</button>`:`<div class="${cls}">${inner}</div>`}</li>`}).join('')}</ol>
  </div></section>`}
@@ -2692,6 +2695,9 @@ function joinFee(g){return gymPromo(g)?0:g.re?g.re.jf:15}
 function baseFee(g){return g.re?g.re.jf:15}
 function applyGymPrices(){const g=GYMS[gymPick]||GYMS[0],r=g.re;[0,1,2].forEach(i=>{PLANS[i].p=r.p[i];PLANS[i].a=i?saverPrice(r,i,saverLen):null});PLANS[4].p=r.day;if(r.stu){STU_T.forEach((t,k)=>{t[3]=r.stu[k];t[1]=PROMO.stu&&PROMO.stuT.includes(k)?promoP(+r.stu[k],PROMO.stu):r.stu[k]})}}
 function gymHas(k){const r=(GYMS[gymPick]||GYMS[0]).re;return k==='student'?!!r.stu:k==='day'?!!r.day:k==='op'?!!r.p[0]:true}
+function mEnd(m,y){const d=new Date();d.setHours(12,0,0,0);const day=d.getDate();d.setDate(1);d.setMonth(d.getMonth()+m);d.setDate(Math.min(day,new Date(d.getFullYear(),d.getMonth()+1,0).getDate()));d.setDate(d.getDate()-1);return d.toLocaleDateString('en-GB',y?{day:'numeric',month:'long',year:'numeric'}:{day:'numeric',month:'long'})}
+function ordN(n){return n+(n%100>10&&n%100<14?'th':['th','st','nd','rd'][n%10]||'th')}
+function paySum(){const g=GYMS[gymPick]||GYMS[0],pl=PLANS[planPick];if(pl.once)return {tot:+pl.p};if(planPick===3)return {tot:+STU_T[stuTerm][1]};const ann=billAnnual&&joinWay==='monthly'&&!!pl.a,base=+(ann?pl.a:pl.p),fo=!ann&&planPick===2&&g.re.u1&&!state.returning?+(pl.p-g.re.u1).toFixed(2):0,bud=!ann&&joinWay==='buddy'&&SU.from?+((base-fo)/2).toFixed(2):0,fee=state.returning||ann?0:joinFee(g);return {ann,base,fo,bud,fee,waived:!state.returning&&!ann&&gymPromo(g),tot:+(base-fo-bud+fee).toFixed(2)}}
 function firstOff(){const g=GYMS[gymPick]||GYMS[0];return planPick===2&&!billAnnual&&g.re.u1&&!state.returning?(PLANS[2].p-g.re.u1):0}
 function feeDue(){return state.returning||planPick===3||planPick===4||billAnnual?0:joinFee(GYMS[gymPick]||GYMS[0])}
 function sortBy(){return gymSort||(gymQ.trim()||loc==='on'?'near':'az')}
@@ -2837,8 +2843,11 @@ function dayChips(id,cur,fn){return `<div class="daychips" id="${id}" role="grou
 let gymTab='overview';
 function gymSections(g,t){const on=k=>!t||t===k;return `
   ${on('overview')?`<section class="card"><h2 class="h2">Opening hours</h2>
-   <div class="hours" style="margin-top:6px"><div class="hr"><b>Gym floor</b><span>Open 24 hours, every day</span></div><div class="hr"><b>Staffed</b><span>Mon to Fri 7am–10pm</span></div><div class="hr"><b>Staffed</b><span>Sat and Sun 8am–6pm</span></div></div>
-   <p class="meta" style="margin-top:6px">Get in any time: just scan the pod with your app.</p></section>
+   <ul class="ohl">
+    <li><span class="ohi">${ico('clock')}</span><div><b>Open 24/7</b><span>Every day. Scan in with the app.</span></div></li>
+    <li><span class="ohi">${ico('users')}</span><div><b>Staffed</b><span>Mon–Fri 7am–10pm<br>Sat–Sun 8am–6pm</span></div></li>
+    ${gymFlag(g,'op')?`<li><span class="ohi">${ico('sun-moon')}</span><div><b>Off-peak members</b><span>Any time, except Mon–Fri 4:30–8pm</span></div></li>`:''}
+   </ul></section>
   <section class="card"><div class="busyhead"><h2 class="h2">When it’s busy</h2><span class="badge live" id="busylive" ${busyDay===1?'':'hidden'}>Live</span></div>${dayChips('busydays',busyDay,'setBusyDay')}<div id="busychart">${busyChart()}</div></section>`:''}
   ${on('amenities')&&gymFlag(g,'w')?`<section class="women"><span class="wi">${ico('users')}</span><div><h2 class="h3">Women-only area</h2><p>A dedicated space with free weights, benches and a cable machine. Open whenever the gym is.</p></div></section>`:''}
   ${on('amenities')?`<section class="gsec" style="gap:12px"><h2 class="h2">The kit</h2><div class="kit">${KIT.map(([i,n,s])=>`<div><span class="ki">${ico(i)}</span><b>${n}</b><span>${s}</span></div>`).join('')}</div></section>`:''}
@@ -2919,7 +2928,7 @@ function obTerm(){applyGymPrices();if(billMode==='s'){const g=GYMS[gymPick];retu
   <h2 class="display ps-n">Student</h2><p class="ps-g">${ico('map-pin')}${esc(g.n)}</p>
   <ul>${STU_F.slice(0,3).map(x=>`<li>${ico('check')}${x}</li>`).join('')}<li class="more">+${STU_F.length-3} more</li></ul></section>
  ${stuRows()}
- <div class="rj-last">${ico('info')}<span>One payment covers ${STU_T[stuTerm][0]} months, until ${STU_T[stuTerm][2]}. Verify with your student email or UNiDAYS within 14 days.</span></div>
+ <div class="rj-last">${ico('info')}<span>One payment covers ${STU_T[stuTerm][0]} months, until ${mEnd(STU_T[stuTerm][0],1)}. Verify with your student email or UNiDAYS within 14 days.</span></div>
  </div>
  <div class="obfoot"><button class="btn btn-primary" onclick="planPick=3;goOb(rejoining()?'pay':'details')"><span>Join Student <span class="btn-price">for £${STU_T[stuTerm][1]} upfront</span></span>${ico('arrow-right')}</button></div>`}const g=GYMS[gymPick],i=tierPick,T=planTerms(i),term=billAnnual?'a'+saverLen:'m',rj=rejoining();if(!T.some(t=>t[0]===term)){billMode='m';billAnnual=false}
  return `<div class="obhead"><button class="iconbtn glass" aria-label="Back" onclick="obPrev('tiers')">${ico('arrow-left')}</button></div>
@@ -2937,7 +2946,7 @@ function planCards(){const g=GYMS[gymPick]||GYMS[0],r=g.re,C=[0,1,2].filter(i=>r
   ${CMPF.map(([l,v])=>`<div class="cmpt-r" role="row" style="${gc}"><span class="cl" role="rowheader">${l}</span>${C.map(i=>`<span role="cell" class="${tierPick===i?'on':''}">${cmpCell(v[i])}</span>`).join('')}</div>`).join('')}
  </div>
  <p class="fine cmpt-note">*Selected gyms only.</p>`}
-const BEN=[['clock','24/7 gym access','Train whenever suits you, early mornings, late nights and weekends. Off-peak members train outside the busiest hours.',[1,2]],
+const BEN=[['clock','24/7 gym access','Train whenever suits you, early mornings, late nights and weekends.',[1,2],'<b>On Off-peak?</b> Train Monday to Friday from midnight to 4:30pm and 8pm to midnight, plus any time at weekends. You skip the busy evening slot, so it costs less.'],
  ['map-pin','Access all gyms','Use any Gym Group gym in the UK at no extra cost. Handy if you work in one place and live in another.',[2]],
  ['users','Free classes','Book classes in the app at no extra cost, from strength and HIIT to mind and body.',[0,1,2]],
  ['circle-pause','Freeze your membership for free','Life gets busy. Pause your monthly membership once for free and pick up when you’re ready.',[2]],
@@ -2945,7 +2954,7 @@ const BEN=[['clock','24/7 gym access','Train whenever suits you, early mornings,
  ['play','Free Fiit workouts and plans','Guided workouts and plans from Fiit to follow in the gym or at home, worth £20 a month.',[2]],
  ['activity','Fitness and body composition tracking','Track your workouts in the app wherever you train. At selected gyms, smart scales also show how your body composition is changing, not just your weight.',[2]]];
 function benSheet(){const r=(GYMS[gymPick]||GYMS[0]).re,C=[0,1,2].filter(i=>r.p[i]);
- modal('Your benefits.','What you get',`<p class="body">Here’s what each benefit means for your training, and which plans include it.</p><ul class="benl">${BEN.map(([ic,t,d,on])=>`<li><span class="ri">${ico(ic)}</span><div><b>${t}</b><p>${d}</p><div class="benp">${C.map(i=>`<span class="${on.includes(i)?'in':''}">${on.includes(i)?ico('check'):''}${PLANS[i].n}</span>`).join('')}</div></div></li>`).join('')}</ul>`);$('#overlay .sheet').classList.add('half')}
+ modal('Your benefits.','What you get',`<p class="body">Here’s what each benefit means for your training, and which plans include it.</p><ul class="benl">${BEN.map(([ic,t,d,on,nt])=>`<li><span class="ri">${ico(ic)}</span><div><b>${t}</b><p>${d}</p>${nt?`<p class="bennote">${nt}</p>`:''}<div class="benp">${C.map(i=>`<span class="${on.includes(i)?'in':''}">${on.includes(i)?ico('check'):''}${PLANS[i].n}</span>`).join('')}</div></div></li>`).join('')}</ul>`);$('#overlay .sheet').classList.add('half')}
 function pcSel(i){tierPick=i;planPick=i;if(billAnnual&&planTerms(i).length<2){billMode='m';billAnnual=false}applyGymPrices();keepOb()}
 function pcPick(i,k){const rl=$('#pcrail'),x=rl?rl.scrollLeft:0;tierPick=i;planPick=i;if(k==='m'){billMode='m';billAnnual=false}else{saverLen=+k.slice(1);billMode=k;billAnnual=true}applyGymPrices();keepOb();const r2=$('#pcrail');if(r2){r2.scrollLeft=x;pcCenter(i,true)}}
 function pcCenter(i,smooth){const rl=$('#pcrail'),c=rl&&rl.querySelector(`.pcard[data-i="${i}"]`);if(c)rl.scrollTo({left:c.offsetLeft-(rl.clientWidth-c.offsetWidth)/2,behavior:smooth?'smooth':'auto'})}
@@ -2963,7 +2972,7 @@ function offersStrip(md){const g=GYMS[gymPick]||GYMS[0],r=g.re,O=[];
  return `<section class="offers" aria-label="Offers at ${esc(g.n)}"><div class="of-h"><span>${ico('tag')} Offers at this gym</span><small>Ends ${PROMO.ends}</small></div><ul>${O.map(([ic,t,d])=>`<li><span class="ri">${ico(ic)}</span><div><b>${t}</b><small>${d}</small></div></li>`).join('')}</ul></section>`}
 function promoSheet(stu){const g=GYMS[gymPick]||GYMS[0];if(stu){modal('No joining fee.','Students at '+esc(g.n),`<p class="body">Student memberships never have a joining fee. Pay once for 6, 9 or 12 months and that’s it.</p><ul class="benl" style="margin-top:8px">${[['graduation-cap','Just verify you’re a student','Use your student email or UNiDAYS when you join.'],['circle-check','Nothing to claim','It’s applied automatically. You’ll see £0 at payment.']].map(([ic,t,d])=>`<li><span class="ri">${ico(ic)}</span><div><b>${t}</b><p>${d}</p></div></li>`).join('')}</ul>`,`<button class="btn btn-primary" onclick="closeModal()">Got it</button>`);$('#overlay .sheet').classList.add('half');return}modal('No joining fee.','Offer at '+esc(g.n),`<p class="body">Join ${esc(g.n)} on any monthly plan by ${PROMO.ends} and we’ll waive the £${baseFee(g)} joining fee.</p>
  <ul class="benl" style="margin-top:8px">${[['calendar-check','Ends '+PROMO.ends,'Join by 11:59pm on '+PROMO.ends+' to get it.'],['credit-card','Monthly plans only','Off-peak, Standard and Ultimate. Upfront, student and day passes never have a joining fee.'],['circle-check','Nothing to claim','It’s applied automatically. You’ll see it at payment.']].map(([ic,t,d])=>`<li><span class="ri">${ico(ic)}</span><div><b>${t}</b><p>${d}</p></div></li>`).join('')}</ul>`,`<button class="btn btn-primary" onclick="closeModal()">Got it</button>`);$('#overlay .sheet').classList.add('half')}
-function gymFlag(g,k){if(/Peckham Rye/.test(g.n))return true;let h=0;for(const c of g.n+k)h=(h*31+c.charCodeAt(0))>>>0;return k==='hx'?h%3===0:h%4===0}
+function gymFlag(g,k){if(k==='op')return !!(g.re&&+g.re.p[0]);if(/Peckham Rye/.test(g.n))return true;let h=0;for(const c of g.n+k)h=(h*31+c.charCodeAt(0))>>>0;return k==='hx'?h%3===0:h%4===0}
 function obTiers(){applyGymPrices();if(tierPick===0&&!PLANS[0].p){tierPick=1;planPick=1}if(billAnnual&&!PLANS[tierPick].a){if(PLANS[2].a||PLANS[1].a){tierPick=PLANS[1].a?1:2;planPick=tierPick}else{billMode='m';billAnnual=false}}const g=GYMS[gymPick],rj=rejoining();if(joinWay==='day'&&!gymHas('day'))joinWay='monthly';const md=joinWay==='day'?'d':billMode==='s'?'s':'m';
  const PT=[['m','Membership'],['s','Student'],['d','Day pass']].filter(([k])=>k==='m'||gymHas(k==='d'?'day':'student'));
  return `<div class="obhead"><button class="iconbtn glass" aria-label="Back" onclick="goOb(rejoining()&&planBack==='back'?'back':planBack||'find')">${ico('arrow-left')}</button></div>
@@ -3076,24 +3085,24 @@ function obDetails(){applyGymPrices();const g=GYMS[gymPick];return `<div class="
 function dobMask(el){let v=el.value.replace(/\D/g,'').slice(0,8);el.value=[v.slice(0,2),v.slice(2,4),v.slice(4)].filter(Boolean).join(' / ');SU.dob=el.value;el.closest('.field').classList.remove('err')}
 function ferr(id,msg){const f=$('#f-'+id);if(!f)return;f.classList.add('err');$('#e-'+id).textContent=msg}
 function detailsNext(){goOb('pay')}
-function obPay(){applyGymPrices();if(!SU.cname&&SU.first)SU.cname=(SU.first.trim()+' '+(SU.last||'').trim()).trim().replace(/\b\w/g,m=>m.toUpperCase());const g=GYMS[gymPick],pl=PLANS[planPick],ann=billAnnual&&joinWay==='monthly'&&!!pl.a,rj=rejoining();if(!rj&&SU.pay==='saved')SU.pay='card';const saved=SU.pay==='saved',card=SU.pay==='card';return `<div class="obhead"><button class="iconbtn glass" aria-label="Back" onclick="obPrev(rejoining()?'tiers':'details')">${ico('arrow-left')}</button></div>
+function obPay(){applyGymPrices();if(!SU.cname&&SU.first)SU.cname=(SU.first.trim()+' '+(SU.last||'').trim()).trim().replace(/\b\w/g,m=>m.toUpperCase());const g=GYMS[gymPick],pl=PLANS[planPick],ann=billAnnual&&joinWay==='monthly'&&!!pl.a,rj=rejoining();if(!rj&&SU.pay==='saved')SU.pay='card';const saved=SU.pay==='saved',card=SU.pay==='card',P=paySum();return `<div class="obhead"><button class="iconbtn glass" aria-label="Back" onclick="obPrev(rejoining()?'tiers':'details')">${ico('arrow-left')}</button></div>
  <form class="obbody" novalidate onsubmit="event.preventDefault();payNext()">${steps(3)}
   <h1 class="display d-title">${rj?'Confirm and rejoin.':'Payment.'}</h1>
   <section class="osum" aria-label="Order summary">
 ${pl.once?`   <div class="r"><span>Day pass<small>${esc(g.n)} · one visit</small></span><b>£${pl.p}</b></div>
-   <div class="r"><span>Visit date</span><b>Today, 4 Nov</b></div>
+   <div class="r"><span>Visit date</span><b>Today, ${new Date().toLocaleDateString('en-GB',{day:'numeric',month:'short'})}</b></div>
    <div class="r tot"><span>Due today<small>One-off. No recurring payments</small></span><b>£${pl.p}</b></div>
   </section>
   <p class="meta" style="margin-top:-4px">Gym entry will be ready in the app. Enjoyed it? Upgrade to a membership any time.</p>`:planPick===3?`   <div class="r"><span>Student membership<small>${esc(g.n)} · ${STU_T[stuTerm][0]} months, paid upfront</small></span><b>£${STU_T[stuTerm][1]}</b></div>
    <div class="r"><span>Joining fee<small>No joining fee for students</small></span><b>£0.00</b></div>
-   <div class="r tot"><span>Due today<small>Covers you until ${STU_T[stuTerm][2]}</small></span><b>£${STU_T[stuTerm][1]}</b></div>
+   <div class="r tot"><span>Due today<small>Covers you until ${mEnd(STU_T[stuTerm][0],1)}</small></span><b>£${STU_T[stuTerm][1]}</b></div>
   </section>
   <p class="meta" style="margin-top:-4px">One payment, no recurring charges. We’ll remind you a month before it ends. Verify your student status within 14 days.</p>`:`   <div class="r"><span>${pl.n} membership<small>${esc(g.n)} · ${ann?'paid upfront for '+saverLen+' months':pl.tag?'verify within 14 days':'no contract'}</small></span><b>${ann?'£'+pl.a:'£'+pl.p+'/mo'}</b></div>${ann?`<div class="r"><span>Upfront saving<small>${PROMO.up?PROMO.up+'% offer, ':''}vs paying monthly</small></span><b style="color:var(--success)">−£${(pl.p*saverLen-pl.a).toFixed(2)}</b></div>`:''}
-   ${firstOff()?`<div class="r"><span>First month offer<small>£${(PLANS[2].p-firstOff()).toFixed(2)} for your first month of Ultimate</small></span><b style="color:var(--success)">−£${firstOff().toFixed(2)}</b></div>`:''}
-   ${joinWay==='buddy'&&SU.from?`<div class="r"><span>Buddy up<small>Half price first month with ${esc(SU.from)}</small></span><b style="color:var(--success)">−£${(pl.p/2).toFixed(2)}</b></div>`:''}<div class="r"><span>Joining fee<small>${state.returning?'Waived. Welcome back':ann?'None on upfront plans':PROMO.nojf?`Offer: usually £${baseFee(g)}`:'One-off, at '+esc(g.n.replace('London ',''))}</small></span><b>${!state.returning&&!ann&&PROMO.nojf?`<s style="color:var(--ink-3);font-weight:500;margin-right:6px">£${baseFee(g).toFixed(2)}</s>`:''}£${feeDue().toFixed(2)}</b></div>
-   <div class="r tot"><span>Due today<small>Covers you until ${ann?(saverLen===9?'3 August 2027':'3 November 2027'):'3 December'}</small></span><b>£${(parseFloat(ann?pl.a:joinWay==='buddy'&&SU.from?(pl.p/2):pl.p)-firstOff()+feeDue()).toFixed(2)}</b></div>
+   ${P.fo?`<div class="r"><span>First month offer<small>£${(pl.p-P.fo).toFixed(2)} for your first month of Ultimate</small></span><b style="color:var(--success)">−£${P.fo.toFixed(2)}</b></div>`:''}
+   ${P.bud?`<div class="r"><span>Buddy up<small>Half price first month with ${esc(SU.from)}</small></span><b style="color:var(--success)">−£${P.bud.toFixed(2)}</b></div>`:''}<div class="r"><span>Joining fee<small>${state.returning?'Waived. Welcome back':ann?'None on upfront plans':P.waived?`Offer: usually £${baseFee(g)}`:'One-off, at '+esc(g.n.replace('London ',''))}</small></span><b>${P.waived?`<s style="color:var(--ink-3);font-weight:500;margin-right:6px">£${baseFee(g).toFixed(2)}</s>`:''}£${P.fee.toFixed(2)}</b></div>
+   <div class="r tot"><span>Due today<small>Covers you until ${ann?mEnd(saverLen,1):mEnd(1)}</small></span><b>£${P.tot.toFixed(2)}</b></div>
   </section>
-  <p class="meta" style="margin-top:-4px">${ann?`One upfront payment. We’ll remind you a month before it ends.`:`Then £${pl.p} on the 4th of each month. Cancel or freeze any time in the app.`}</p>${joinWay==='buddy'&&!SU.from?`<div class="bud-back">${ico('gift')}<span><b>£${(pl.p/2).toFixed(2)} back when ${esc(budName())} joins</b><small>Half your first month, paid back to this card when they join on any membership plan within 7 days.</small></span></div>`:''}`}
+  <p class="meta" style="margin-top:-4px">${ann?`One upfront payment. We’ll remind you a month before it ends.`:`Then £${pl.p} on the ${ordN(new Date().getDate())} of each month. Cancel or freeze any time in the app.`}</p>${joinWay==='buddy'&&!SU.from?`<div class="bud-back">${ico('gift')}<span><b>£${(pl.p/2).toFixed(2)} back when ${esc(budName())} joins</b><small>Half your first month, paid back to this card when they join on any membership plan within 7 days.</small></span></div>`:''}`}
   ${rj?`<div class="rj-card${saved?' on':''}" role="radio" aria-checked="${saved}" tabindex="0" onclick="SU.pay='saved';keepOb()"><span class="radio"></span><span class="ri">${ico('credit-card')}</span><span><b>Visa ending ${PAST.card}</b><small>From your last membership</small></span></div>${saved?'':''}`:''}
   ${rj&&saved?`<button type="button" class="link" style="align-self:flex-start" onclick="SU.pay='card';keepOb()">Use a different card</button>`:`<div class="paytabs" role="group" aria-label="Payment method"><button type="button" aria-pressed="${card}" onclick="SU.pay='card';keepOb()">${ico('credit-card')} Card</button><button type="button" aria-pressed="${!card}" onclick="SU.pay='apple';keepOb()">Apple Pay</button></div>
   ${card?`<div class="field cardnum" id="f-card"><label for="su-card">Card number</label><div class="cardnum"><input id="su-card" type="text" inputmode="numeric" autocomplete="cc-number" placeholder="1234 5678 9012 3456" maxlength="23" value="${esc(SU.card)}" oninput="cardMask(this)" style="padding-right:80px"><span class="brands" aria-hidden="true"><i>VISA</i><i>MC</i></span></div><span class="emsg" id="e-card"></span></div>
@@ -3102,7 +3111,7 @@ ${pl.once?`   <div class="r"><span>Day pass<small>${esc(g.n)} · one visit</smal
   ${fld('post','Billing postcode','text','SE15 4ST','postal-code','style="text-transform:uppercase"')}`:`<p class="body">You’ll confirm with Face ID or Touch ID. No card details to type.</p>`}`}
   <label class="tick" id="f-terms"><input type="checkbox" ${SU.terms?'checked':''} onchange="SU.terms=this.checked;this.closest('.tick').classList.remove('err')"><span>I agree to the <u>membership terms</u> and have read the <u>privacy policy</u>.</span></label>
   <div class="secure">${ico('lock')} Payments are encrypted and processed securely.</div>
-  <div class="obfoot" style="margin:auto -20px -20px">${card||saved?`<button type="submit" class="btn btn-primary">${ico('lock')} Pay £${planPick===3?STU_T[stuTerm][1]:pl.once?pl.p:(parseFloat(ann?pl.a:joinWay==='buddy'&&SU.from?(pl.p/2):pl.p)-firstOff()+feeDue()).toFixed(2)}${pl.once?'':rj?' and rejoin':' and join'}</button>`:`<button type="submit" class="applepay" aria-label="Pay with Apple Pay">Pay with Apple Pay</button>`}</div>
+  <div class="obfoot" style="margin:auto -20px -20px">${card||saved?`<button type="submit" class="btn btn-primary">${ico('lock')} Pay £${P.tot.toFixed(2)}${pl.once?'':rj?' and rejoin':' and join'}</button>`:`<button type="submit" class="applepay" aria-label="Pay with Apple Pay">Pay with Apple Pay</button>`}</div>
  </form>`}
 function keepOb(){const y=$('#onboard').scrollTop;renderOb();$('#onboard').scrollTop=y}
 function cardMask(el){const v=el.value.replace(/\D/g,'').slice(0,19);el.value=v.replace(/(.{4})/g,'$1 ').trim();SU.card=el.value;el.closest('.field').classList.remove('err')}
